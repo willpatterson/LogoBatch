@@ -1,0 +1,13 @@
+---
+job:
+  - name: Bsearch
+  - executable: /bsearch/path
+
+  - input:
+    flag: -p
+    position:
+
+  - output:
+    flag: -o
+    position:
+    destination: out/bsearch
