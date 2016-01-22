@@ -32,17 +32,17 @@ end
 
 function unpack_directory(model_directory, dir_name)
     output_dir = *(dir_name, "_out/") 
-    output_path = join([model_directory, "out", output_dir], "/")
+    output_path = joinpath(model_directory, "out", output_dir)
     mkpath(output_path)
     
-    dir_path = join([model_directory, "in", dir_name], "/")
+    dir_path = joinpath(model_directory, "in", dir_name)
     dir_listing = readdir(dir_path)
 
     commands = []
     for item in dir_listing
-        if !startswith(item, ".") && endswith(item, ".csv") && isfile(join([dir_path, item], "/"))
-            csv_file_path = join([dir_path, item], "/")
-            commands = vcat(parse_csv_to_commands(csv_file_path, output_path), commands)
+        item_path = joinpath(dir_path, item_path)
+        if !startswith(item, ".") && endswith(item, ".csv") && isfile(item_path)
+            commands = vcat(parse_csv_to_commands(item_path, output_path), commands)
         end
     end
     return commands
@@ -76,13 +76,13 @@ end
 function main()    
     args = parse_commandline()
 
-    in_dir = join([args["model_directory"], "in"], "/")
-    out_dir = join([args["model_directory"], "out"], "/")
+    in_dir = joinpath(args["model_directory"], "in")
+    out_dir = joinpath(args["model_directory"], "out")
 
     commands = []
     in_listing = readdir(in_dir)
     for dir in in_listing
-        if !startswith(dir, ".") && isdir(join([in_dir, dir], "/"))
+        if !startswith(dir, ".") && isdir(joinpath(in_dir, dir))
             commands = vcat(unpack_directory(args["model_directory"], dir), commands)
         end
     end
