@@ -22,7 +22,8 @@ function parse_csv_to_commands(csv_file, outpath="./out/")
     for row in eachrow(data)
         command = row[1]
         for (i, name) in enumerate(col_names[2:end])
-            command = join([command, row[i+1]], *(replace(string(name), "_", " -"), " "))
+            println(name)
+            command = join([command, row[i+1]], *(" ", replace(string(name), "_", "-"), " "))
             command = replace(command, "OUT", outpath)
         end
         push!(commands, command)
@@ -40,7 +41,7 @@ function unpack_directory(model_directory, dir_name)
 
     commands = []
     for item in dir_listing
-        item_path = joinpath(dir_path, item_path)
+        item_path = joinpath(dir_path, item)
         if !startswith(item, ".") && endswith(item, ".csv") && isfile(item_path)
             commands = vcat(parse_csv_to_commands(item_path, output_path), commands)
         end
@@ -49,8 +50,10 @@ function unpack_directory(model_directory, dir_name)
 end
         
 function run_job(command)
-    run(`$command`)
+    run(`echo test`)
+    #run(`$command`)
 end
+
 
 function schedule_jobs(commands, output_dir)
     job_num = length(commands)
@@ -59,18 +62,20 @@ function schedule_jobs(commands, output_dir)
     #slurm_out = join([output_dir, "slurm_output"], "/")
     #mkdir(slurm_out)
 
-    addprocs(SlurmManager(job_num), nodes=node_num)
+    addprocs(SlurmManager(job_num))#, nodes=node_num)
 
-    pmap(run_job, commands)
     #=
+    pmap(run_job, commands)
+    =#
     @parallel for i in workers()
-        run()
+        #command = commands[i]
+        run(`echo $i`)
+        #run(`$command`)
     end
 
     for i in workers()
         rmprocs(i)
     end
-    =#
 end
 
 function main()    
