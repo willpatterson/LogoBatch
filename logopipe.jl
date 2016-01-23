@@ -1,7 +1,8 @@
 using DataFrames
-using ClusterManagers
+#using ClusterManagers
 using ArgParse
 using YAML
+using Persist
 
 function parse_commandline()
     settings = ArgParseSettings()
@@ -15,16 +16,16 @@ function parse_commandline()
     return parse_args(settings)
 end
 
-function parse_csv_to_commands(csv_file, outpath="./out/")
+function parse_csv_to_commands(csv_file, model_directory, outpath="./out/")
     data = readtable(csv_file)
     commands = []
     col_names = names(data)
     for row in eachrow(data)
         command = row[1]
         for (i, name) in enumerate(col_names[2:end])
-            println(name)
             command = join([command, row[i+1]], *(" ", replace(string(name), "_", "-"), " "))
             command = replace(command, "OUT", outpath)
+            command = replace(command, "MOD", model_directory)
         end
         push!(commands, command)
     end
@@ -43,39 +44,57 @@ function unpack_directory(model_directory, dir_name)
     for item in dir_listing
         item_path = joinpath(dir_path, item)
         if !startswith(item, ".") && endswith(item, ".csv") && isfile(item_path)
-            commands = vcat(parse_csv_to_commands(item_path, output_path), commands)
+            commands = vcat(parse_csv_to_commands(item_path, model_directory, output_path), commands)
         end
     end
     return commands
 end
         
-function run_job(command)
-    run(`echo test`)
+@everywhere function run_job(command, model_directory)
+    cd(model_directory)
+    return readall(`$command`)
+    #run(`echo test`)
     #run(`$command`)
 end
 
 
-function schedule_jobs(commands, output_dir)
-    job_num = length(commands)
-    node_num = 1
+@everywhere function test_run_job()
+    return readall(`echo test`)
+end
 
-    #slurm_out = join([output_dir, "slurm_output"], "/")
-    #mkdir(slurm_out)
-
-    addprocs(SlurmManager(job_num))#, nodes=node_num)
+function schedule_jobs(commands, output_dir, model_directory)
+#function schedule_jobs()
+    #job_num = length(commands)
+    #node_num = 1
+    job_num = 10
 
     #=
-    pmap(run_job, commands)
-    =#
-    @parallel for i in workers()
-        #command = commands[i]
-        run(`echo $i`)
-        #run(`$command`)
+    addprocs(SlurmManager(job_num))
+    output = []
+    pids = []
+    for i in workers()
+        #host, pid = fetch(@spawnat i (run_job("ls", model_directory), getpid()))
+        out, pid = fetch(@spawnat i (test_run_job(), getpid()))
+        push!(output, out)
+        push!(pids, pid)
     end
+    println(output)
 
     for i in workers()
         rmprocs(i)
     end
+    =#
+    
+    jobs = []
+    for (count, command) in enumerate(commands)
+        jobname = *("logopipe-", string(count)) 
+        @persist jobname SlurmManager (cd(model_directory); run(`$command`))
+        push!(jobs, jobname)
+    end
+        
+
+
+
 end
 
 function main()    
@@ -94,8 +113,9 @@ function main()
     for command in commands
         println(command)
     end
-    schedule_jobs(commands, out_dir)
+    schedule_jobs(commands, out_dir, args["model_directory"])
 end
 
 main()
+#schedule_jobs()
 
