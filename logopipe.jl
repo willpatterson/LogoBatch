@@ -20,12 +20,13 @@ function parse_csv_to_commands(csv_file, model_directory, outpath="./out/")
     data = readtable(csv_file)
     commands = []
     col_names = names(data)
-    for row in eachrow(data)
+    for (count, row) in enumerate(eachrow(data))
         command = row[1]
         for (i, name) in enumerate(col_names[2:end])
             command = join([command, row[i+1]], *(" ", replace(string(name), "_", "-"), " "))
-            command = replace(command, "OUT", outpath)
-            command = replace(command, "MOD", model_directory)
+            command = replace(command, "*OUTD*", outpath)
+            command = replace(command, "*OUTF*", joinpath(outpath, join([basename(outpath), count], "_")))
+            command = replace(command, "*MOD*", model_directory)
         end
         push!(commands, command)
     end
@@ -89,12 +90,16 @@ function schedule_jobs(commands, output_dir, model_directory)
     for (count, command) in enumerate(commands)
         jobname = *("logopipe-", string(count)) 
         @persist jobname SlurmManager (cd(model_directory); run(`$command`))
-        push!(jobs, jobname)
+        push!(jobs, readmgr(jobname))
     end
         
-
-
-
+    while !all(map(isready, jobs))
+        for status in map(status, jobs)
+            println(status)
+        end
+        sleep(10)
+        println("wating")
+    end
 end
 
 function main()    
@@ -110,9 +115,11 @@ function main()
             commands = vcat(unpack_directory(args["model_directory"], dir), commands)
         end
     end
+
     for command in commands
         println(command)
     end
+
     schedule_jobs(commands, out_dir, args["model_directory"])
 end
 
