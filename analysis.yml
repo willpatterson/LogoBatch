@@ -1,13 +1,11 @@
-analysis:
-    - name:    "OneWaySA"
-    - command: "{exe} --model {mod}BUPwithMUASimple1.nlogo --experiment {unique} --table {mod}/out/{unique}.out --threads 5"
-    - exe:     "/share/apps/user/stow/netlogo-5.2.1/netlogo-headless.sh"
-    - unique:  "OneWaySA77.csv"
+- analysis:
+    name: "OneWaySA"
+    command: "{exe} --model {mod}BUPwithMUASimple1.nlogo --experiment {unique} --table {mod}/out/{unique}.out --threads 5"
+    exe:     "/share/apps/user/stow/netlogo-5.2.1/netlogo-headless.sh"
+    unique:  "OneWaySA77.csv"
 
-analysis:
-    - name: "BsearchSA"
-    - command: "{exe} -n 3 -p {mod}/{unique} -o {mod}/out/{unique}.out --threads 5"
-    - exe: "/share/apps/user/stow/netlogo-5.2.1/behaviorsearch/behaviorsearch_headless.sh"
-    - unique: "bsearchSA.csv"
-    
-
+- analysis:
+    name: "BsearchSA"
+    command: "{exe} -n 3 -p {mod}/{unique} -o {mod}/out/{unique}.out --threads 5"
+    exe: "/share/apps/user/stow/netlogo-5.2.1/behaviorsearch/behaviorsearch_headless.sh"
+    unique: "bsearchSA.csv"
