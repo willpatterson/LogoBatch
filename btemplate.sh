@@ -17,19 +17,19 @@
 ##
 
 ## The name of the job that will appear in the output of squeue, qstat, etc.
-#SBATCH --job-name=this-is-the-job-name
+#SBATCH --job-name=nlogo
 
 
 ## max run time HH:MM:SS
 
-#SBATCH --time=10:00:00
+#SBATCH --time=20:00:00
 
 
 ## -N, --nodes=<minnodes[-maxnodes]>
 ## Request that a minimum of minnodes nodes (servers) be allocated to this job.
 ## A maximum node count may also be specified with maxnodes.
 
-#SBATCH --nodes 1
+##SBATCH --nodes 1
 
 
 ## -n, --ntasks=<number>
@@ -40,20 +40,10 @@
 
 #SBATCH -n 3
 
-
-## For hydra, main and main2 are the available partitions.  This line is safe to omit
-## on gravel as CLUSTER is the only partition.  Check /etc/partitions.conf for currently
-## defined partitions.
-
-#SBATCH --partition main
+#SBATCH --partition main,main2
 #SBATCH --cpus-per-task=5
 #SBATCH --mem-per-cpu=1500
 
 ##
 ## Commands start here
 ##
-
-## Command(s) to run.  If this example file is run as is, the effect will be the creation of
-## a file called slurm-ZZZ.out in the current directory containing "Hello, world!" five times.
-## The ZZZ is the job number that is printed after you run "sbatch example.sh".
-
