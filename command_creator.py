@@ -3,7 +3,19 @@ import yaml
 import argparse
 import datetime
 
+def read_yaml(yaml_path, y_object_name):
+    with open(yaml_path, 'r') as yfile:
+        ydata = yaml.load(yfile)
+
+    batches = []
+    for batch in ydata:
+        if batch[y_object_name]["enabled"] is True:
+            batches.append(analysis[y_object_name])
+
+    return batches
+
 def create_commands(model_path, run_name):
+    """opens yaml file from model directory and uses it to create ommands for slurm"""
     in_path = os.path.join(model_path, "in")
 
     in_files = os.listdir(in_path)
@@ -18,7 +30,6 @@ def create_commands(model_path, run_name):
     for analysis in ydata:
         if analysis["analysis"]["enabled"] is True:
             command_data.append(analysis["analysis"])
-
 
     for analysis in command_data:
         analysis["out_path"] = os.path.join(model_path, 'out', run_name, analysis["name"])
@@ -73,7 +84,6 @@ def create_job_files(command_data, model_path, ntasks, run_name):
                     bfile.write("#SBATCH --cpus-per-task={cpus}\n".format(cpus=analysis["cpus"]))
                     bfile.write("#SBATCH -o {slurm}/{job_name}%j.out\n".format(slurm=slurm_dir,
                                                                              job_name=job_name))
-
             #Clean up job name string formatting when files are opened
             with open(os.path.join(analysis["job_dir"], "{}-job-{}.sh".format(analysis["name"],
                                                                   file_count)), 'a') as bfile:
@@ -90,7 +100,13 @@ def schedule_jobs(command_data):
         jobs = [os.path.join(analysis["job_dir"], x) for x in jobs]
 
         for job in jobs:
-            os.system("sbatch {}".format(job))
+            os.system("sbatch {}".format(job))a
+
+def thread_test(batches):
+    for test in batches:
+        for ncpu in range(test["range"]["lower"], test["range"]["upper"]):
+            pass #left off here
+    pass
 
 def get_args():
     """Get arguments"""
