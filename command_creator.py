@@ -52,11 +52,10 @@ def create_job_files(command_data, model_path, ntasks, run_name):
     with open("btemplate.sh", "r") as btemplate:
         template = btemplate.readlines()
 
-
     for analysis in command_data:
-        job_dir = os.path.join(analysis['out_path'], 'jobs')
+        analysis["job_dir"] = os.path.join(analysis['out_path'], 'jobs')
         slurm_dir = os.path.join(analysis['out_path'], 'slurm')
-        os.makedirs(job_dir)
+        os.makedirs(analysis["job_dir"])
         os.makedirs(slurm_dir)
 
         file_count = 0
@@ -65,7 +64,7 @@ def create_job_files(command_data, model_path, ntasks, run_name):
                 file_count += 1
                 job_name = "{name}-job-{count}".format(name=analysis["name"], count=file_count)
 
-                with open(os.path.join(job_dir, ".".join([job_name, "sh"])), 'w') as bfile:
+                with open(os.path.join(analysis["job_dir"], ".".join([job_name, "sh"])), 'w') as bfile:
                     for line in template: #Write Template file
                         bfile.write(line) #
 
@@ -76,26 +75,23 @@ def create_job_files(command_data, model_path, ntasks, run_name):
                                                                              job_name=job_name))
 
             #Clean up job name string formatting when files are opened
-            with open(os.path.join(job_dir, "{}-job-{}.sh".format(analysis["name"],
+            with open(os.path.join(analysis["job_dir"], "{}-job-{}.sh".format(analysis["name"],
                                                                   file_count)), 'a') as bfile:
                 bfile.write(com + '\n')
                 print(com)
 
-    return run_name
+    return command_data
 
-def schedule_jobs(model_path, run_name):
+def schedule_jobs(command_data):
     """Schedules all of the batch files created in slurm"""
-    job_dir = os.path.join(model_path, "in/jobs", run_name)
-    jobs = os.listdir(job_dir)
-    jobs = [os.path.join(job_dir, x) for x in jobs]
 
-    try:
-        os.makedirs(os.path.join(model_path, "out/slurm", run_name))
-    except FileExistsError:
-        pass
+    for analysis in command_data:
+        jobs = os.listdir(analysis["job_dir"])
+        jobs = [os.path.join(analysis["job_dir"], x) for x in jobs]
 
-    for job in jobs:
-        os.system("sbatch {}".format(job))
+        for job in jobs:
+            os.system("sbatch {}".format(job))
+
 
 
 def get_args():
@@ -110,7 +106,7 @@ def get_args():
 def main():
     args = get_args()
     command_data = create_commands(args.model_path, args.run_name)
-    run_name = create_job_files(command_data, args.model_path, args.ntasks, args.run_name)
+    command_data = create_job_files(command_data, args.model_path, args.ntasks, args.run_name)
     schedule_jobs(args.model_path, run_name)
 
 if __name__ == "__main__":
