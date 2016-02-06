@@ -92,14 +92,24 @@ def schedule_jobs(command_data):
         for job in jobs:
             os.system("sbatch {}".format(job))
 
-
-
 def get_args():
     """Get arguments"""
     parser = argparse.ArgumentParser(description="")
-    parser.add_argument("-m", "--model_path", type=str, default=os.getcwd(), help="Directory containing models")
-    parser.add_argument("-n", "--ntasks", type=int, default=1, help="Number of tasks per batch")
-    parser.add_argument("-r", "--run_name", type=str, default=str(datetime.datetime.now().time()).replace(":", "-"), help="Name of the batch run")
+    parser.add_argument("-m",
+                        "--model_path",
+                        type=str,
+                        default=os.getcwd(),
+                        help="Directory containing models")
+    parser.add_argument("-n",
+                        "--ntasks",
+                        type=int,
+                        default=1,
+                        help="Number of tasks per batch")
+    parser.add_argument("-r",
+                        "--run_name",
+                        type=str,
+                        default=str(datetime.datetime.now().time()).replace(":", "-"),
+                        help="Name of the batch run")
 
     return parser.parse_args()
 
