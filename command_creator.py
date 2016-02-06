@@ -3,28 +3,48 @@ import yaml
 import argparse
 import datetime
 
-def read_yaml(yaml_path, y_object_name):
+def read_yaml(yaml_path, batches={}):
     with open(yaml_path, 'r') as yfile:
         ydata = yaml.load(yfile)
 
-    batches = {}
     for batch in ydata:
-        if batch[y_object_name]["enabled"] is True:
-            if 'analysis' in batch.keys():
+        btype = batch.keys()[0]
+        if batch[btype]["enabled"] is True:
+            if btype == 'analysis':
                 try:
                     batches['analysis'] = [batch["analysis"]]
                 except: #fix this
                     batches['analysis'].append(batch['analysis'])
 
-            if 'thread_test' in batch.keys():
+            elif btype == 'thread_test':
                  try:
                     batches['thread_test'] = [batch["thread_test"]]
                 except: #fix this
                     batches['thread_test'].append(batch['thread_test'])
+            else:
+                print('Unrecogized batch type: "{}"'.format(btype))
+
 
             batches.append(analysis[y_object_name])
 
     return batches
+
+def search_model_dir(model_path):
+    in_path = os.path.join(model_path, "in")
+
+    in_files = os.listdir(in_path)
+    in_files = [os.path.join(in_path, infile) for infile in in_files]
+
+    yaml_files = [infile for infile in in_files if infile.endswith(".yml")]
+
+    batches = {}
+    for yfile in yaml_files:
+        read_yaml(yfile, batches=batches)
+
+    return batches
+
+def create_commands_new(model_path, run_name):
+    pass
 
 def create_commands(model_path, run_name):
     """opens yaml file from model directory and uses it to create ommands for slurm"""
