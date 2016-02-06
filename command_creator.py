@@ -16,9 +16,11 @@ def read_yaml(yaml_path, y_object_name):
                 except: #fix this
                     batches['analysis'].append(batch['analysis'])
 
-                pass
             if 'thread_test' in batch.keys():
-                pass
+                 try:
+                    batches['thread_test'] = [batch["thread_test"]]
+                except: #fix this
+                    batches['thread_test'].append(batch['thread_test'])
 
             batches.append(analysis[y_object_name])
 
