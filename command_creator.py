@@ -3,7 +3,7 @@ import yaml
 import argparse
 import datetime
 
-def create_commands(model_path):
+def create_commands(model_path, run_name):
     in_path = os.path.join(model_path, "in")
 
     in_files = os.listdir(in_path)
@@ -21,6 +21,7 @@ def create_commands(model_path):
 
 
     for analysis in command_data:
+        analysis["out_path"] = os.path.join(model_path, 'out', run_name, analysis["name"])
         unique_path = os.path.join(in_path, analysis["unique"])
         commands = []
         with open(unique_path, "r") as uni:
@@ -30,12 +31,14 @@ def create_commands(model_path):
                 inserts = {}
                 if '{exe}' in command:
                     inserts["exe"] = analysis["exe"]
-                if '{unique}' in command:
-                    inserts["unique"] = unique
-                if '{mod}' in command:
-                    inserts["mod"] = model_path
                 if '{cpus}' in command:
                     inserts["cpus"] = analysis["cpus"]
+                if '{out}' in command:
+                    inserts["out"] = analysis["out_path"]
+                if '{mod}' in command:
+                    inserts["mod"] = model_path
+                if '{unique}' in command:
+                    inserts["unique"] = unique
                 command = command.format(**inserts)
 
                 commands.append(command)
@@ -49,10 +52,13 @@ def create_job_files(command_data, model_path, ntasks, run_name):
     with open("btemplate.sh", "r") as btemplate:
         template = btemplate.readlines()
 
-    job_dir = os.path.join(model_path, "in/jobs", run_name)
-    os.makedirs(job_dir)
 
     for analysis in command_data:
+        job_dir = os.path.join(analysis['out_path'], 'jobs')
+        slurm_dir = os.path.join(analysis['out_path'], 'slurm')
+        os.makedirs(job_dir)
+        os.makedirs(slurm_dir)
+
         file_count = 0
         for count, com in enumerate(analysis["commands"]):
             if count % ntasks == 0:
@@ -60,15 +66,16 @@ def create_job_files(command_data, model_path, ntasks, run_name):
                 job_name = "{name}-job-{count}".format(name=analysis["name"], count=file_count)
 
                 with open(os.path.join(job_dir, ".".join([job_name, "sh"])), 'w') as bfile:
-                    for line in template:
-                        bfile.write(line)
+                    for line in template: #Write Template file
+                        bfile.write(line) #
 
+                    #Write automated parameters to file
                     bfile.write("#SBATCH -J {analysis}\n".format(analysis=analysis["name"]))
                     bfile.write("#SBATCH --cpus-per-task={cpus}\n".format(cpus=analysis["cpus"]))
-                    bfile.write("#SBATCH -o {mod}/out/slurm/{run_name}/{job_name}.out\n".format(mod=model_path,
-                                                                                                run_name=run_name,
-                                                                                                job_name=job_name))
+                    bfile.write("#SBATCH -o {slurm}/{job_name}%j.out\n".format(slurm=slurm_dir,
+                                                                             job_name=job_name))
 
+            #Clean up job name string formatting when files are opened
             with open(os.path.join(job_dir, "{}-job-{}.sh".format(analysis["name"],
                                                                   file_count)), 'a') as bfile:
                 bfile.write(com + '\n')
@@ -102,7 +109,7 @@ def get_args():
 
 def main():
     args = get_args()
-    command_data = create_commands(args.model_path)
+    command_data = create_commands(args.model_path, args.run_name)
     run_name = create_job_files(command_data, args.model_path, args.ntasks, args.run_name)
     schedule_jobs(args.model_path, run_name)
 
