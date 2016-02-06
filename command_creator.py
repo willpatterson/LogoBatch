@@ -7,9 +7,19 @@ def read_yaml(yaml_path, y_object_name):
     with open(yaml_path, 'r') as yfile:
         ydata = yaml.load(yfile)
 
-    batches = []
+    batches = {}
     for batch in ydata:
         if batch[y_object_name]["enabled"] is True:
+            if 'analysis' in batch.keys():
+                try:
+                    batches['analysis'] = [batch["analysis"]]
+                except: #fix this
+                    batches['analysis'].append(batch['analysis'])
+
+                pass
+            if 'thread_test' in batch.keys():
+                pass
+
             batches.append(analysis[y_object_name])
 
     return batches
