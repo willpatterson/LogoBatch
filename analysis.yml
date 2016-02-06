@@ -1,11 +1,27 @@
 - analysis:
     name: "OneWaySA"
-    command: "{exe} --model {mod}BUPwithMUASimple1.nlogo --experiment {unique} --table {mod}/out/{unique}.out --threads 5"
+    enabled: false
+    command: "{exe} --model {mod}BUPwithMUASimple1.nlogo --experiment {unique} --table {out}/{unique}.out --threads {cpus}"
     exe:     "/share/apps/user/stow/netlogo-5.2.1/netlogo-headless.sh"
     unique:  "OneWaySA77.csv"
+    cpus: 5
 
 - analysis:
     name: "BsearchSA"
-    command: "{exe} -n 3 -p {mod}/{unique} -o {mod}/out/{unique}.out --threads 5"
+    enabled: true
+    command: "{exe} -n 3 -p {mod}/{unique} -o {out}/{unique}.out --threads {cpus}"
     exe: "/share/apps/user/stow/netlogo-5.2.1/behaviorsearch/behaviorsearch_headless.sh"
     unique: "bsearchSA.csv"
+    cpus: 5
+
+
+- thread_test:
+    name: "BsearchTTest"
+    enabled: false
+    command: "{exe} -n 3 -p {mod}/{unique} -o {out}/{unique}.out --threads {cpus}"
+    exe: "/share/apps/user/stow/netlogo-5.2.1/behaviorsearch/behaviorsearch_headless.sh"
+    unique: "bsearchttest.csv"
+    range:
+        lower: 4
+        upper: 16
+
