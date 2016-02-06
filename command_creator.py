@@ -25,11 +25,20 @@ def create_commands(model_path):
         commands = []
         with open(unique_path, "r") as uni:
             for count, line in enumerate(uni):
-                if count != 0:
-                    unique = line.split(",")[0]
-                    commands.append(analysis["command"].format(exe=analysis["exe"],
-                                                               unique=unique,
-                                                               mod=model_path))
+                unique = line.split(",")[2]
+                command = analysis["command"]
+                inserts = {}
+                if '{exe}' in command:
+                    inserts["exe"] = analysis["exe"]
+                if '{unique}' in command:
+                    inserts["unique"] = unique
+                if '{mod}' in command:
+                    inserts["mod"] = model_path
+                if '{cpus}' in command:
+                    inserts["cpus"] = analysis["cpus"]
+                command = command.format(**inserts)
+
+                commands.append(command)
         analysis["commands"] = commands
 
     return command_data
@@ -41,6 +50,7 @@ def create_job_files(command_data, model_path, ntasks, run_name):
         template = btemplate.readlines()
 
     job_dir = os.path.join(model_path, "in/jobs", run_name)
+    os.makedirs(job_dir)
 
     for analysis in command_data:
         file_count = 0
@@ -62,12 +72,13 @@ def create_job_files(command_data, model_path, ntasks, run_name):
             with open(os.path.join(job_dir, "{}-job-{}.sh".format(analysis["name"],
                                                                   file_count)), 'a') as bfile:
                 bfile.write(com + '\n')
+                print(com)
 
     return run_name
 
 def schedule_jobs(model_path, run_name):
     """Schedules all of the batch files created in slurm"""
-    job_dir os.path.join(model_path, "in/jobs", run_name)
+    job_dir = os.path.join(model_path, "in/jobs", run_name)
     jobs = os.listdir(job_dir)
     jobs = [os.path.join(job_dir, x) for x in jobs]
 
