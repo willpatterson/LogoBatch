@@ -42,10 +42,14 @@ def search_model_dir(model_path):
 
     return batches
 
-def build_run_type(model_path, run_name):
+def build_run_type(run_name, model_path, yaml_path=None):
     #create namedtuple containding batch data model path and run name
     Run = namedtuple('Run', ['run_name', 'model_path', 'batch_data'])
-    batch_data = search_model_dir(model_path)
+    if yaml_path is None:
+        batch_data = search_model_dir(model_path)
+    else:
+        batch_data = read_yaml(yaml_path)
+
     currrent_run = Run(run_name=run_name,
                        model_path=model_path,
                        batch_data=batch_data)
