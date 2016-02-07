@@ -2,6 +2,7 @@ import os
 import yaml
 import argparse
 import datetime
+from collections import namedtuple
 
 def read_yaml(yaml_path, batches={}):
     with open(yaml_path, 'r') as yfile:
@@ -15,7 +16,6 @@ def read_yaml(yaml_path, batches={}):
                     batches['analysis'] = [batch["analysis"]]
                 except: #fix this
                     batches['analysis'].append(batch['analysis'])
-
             elif btype == 'thread_test':
                  try:
                     batches['thread_test'] = [batch["thread_test"]]
@@ -23,7 +23,6 @@ def read_yaml(yaml_path, batches={}):
                     batches['thread_test'].append(batch['thread_test'])
             else:
                 print('Unrecogized batch type: "{}"'.format(btype))
-
 
             batches.append(analysis[y_object_name])
 
@@ -43,7 +42,17 @@ def search_model_dir(model_path):
 
     return batches
 
-def create_commands_new(model_path, run_name):
+def build_run_type(model_path, run_name):
+    #create namedtuple containding batch data model path and run name
+    Run = namedtuple('Run', ['run_name', 'model_path', 'batch_data'])
+    batch_data = search_model_dir(model_path)
+    currrent_run = Run(run_name=run_name,
+                       model_path=model_path,
+                       batch_data=batch_data)
+
+    return currrent_run
+
+def create_commands_new(run_data):
     pass
 
 def create_commands(model_path, run_name):
