@@ -19,7 +19,7 @@ def read_yaml(yaml_path, batches={}):
             elif btype == 'thread_test':
                  try:
                     batches['thread_test'] = [batch["thread_test"]]
-                except: #fix this
+                 except: #fix this
                     batches['thread_test'].append(batch['thread_test'])
             else:
                 print('Unrecogized batch type: "{}"'.format(btype))
@@ -73,8 +73,11 @@ def create_commands(model_path, run_name):
 
     command_data = []
     for analysis in ydata:
-        if analysis["analysis"]["enabled"] is True:
-            command_data.append(analysis["analysis"])
+        try:
+            if analysis["analysis"]["enabled"] is True:
+                command_data.append(analysis["analysis"])
+        except: #FIX this
+            pass
 
     for analysis in command_data:
         analysis["out_path"] = os.path.join(model_path, 'out', run_name, analysis["name"])
@@ -82,7 +85,7 @@ def create_commands(model_path, run_name):
         commands = []
         with open(unique_path, "r") as uni:
             for count, line in enumerate(uni):
-                unique = line.split(",")[2]
+                unique = line.split(",")[0].replace("\n", "")
                 command = analysis["command"]
                 inserts = {}
                 if '{exe}' in command:
@@ -111,8 +114,11 @@ def create_job_files(command_data, model_path, ntasks, run_name):
     for analysis in command_data:
         analysis["job_dir"] = os.path.join(analysis['out_path'], 'jobs')
         slurm_dir = os.path.join(analysis['out_path'], 'slurm')
-        os.makedirs(analysis["job_dir"])
-        os.makedirs(slurm_dir)
+        try:
+            os.makedirs(analysis["job_dir"])
+            os.makedirs(slurm_dir)
+        except FileExistsError:
+            pass
 
         file_count = 0
         for count, com in enumerate(analysis["commands"]):
@@ -141,11 +147,13 @@ def schedule_jobs(command_data):
     """Schedules all of the batch files created in slurm"""
 
     for analysis in command_data:
+        print("asdfasdf")
+        print(analysis["job_dir"])
         jobs = os.listdir(analysis["job_dir"])
         jobs = [os.path.join(analysis["job_dir"], x) for x in jobs]
 
         for job in jobs:
-            os.system("sbatch {}".format(job))a
+            os.system("sbatch {}".format(job))
 
 def thread_test(batches):
     for test in batches:
@@ -178,7 +186,7 @@ def main():
     args = get_args()
     command_data = create_commands(args.model_path, args.run_name)
     command_data = create_job_files(command_data, args.model_path, args.ntasks, args.run_name)
-    schedule_jobs(args.model_path, run_name)
+    schedule_jobs(command_data)
 
 if __name__ == "__main__":
     main()
