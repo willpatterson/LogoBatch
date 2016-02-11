@@ -4,113 +4,171 @@ import argparse
 import datetime
 from collections import namedtuple
 
-def read_yaml(yaml_path, batches={}):
-    with open(yaml_path, 'r') as yfile:
-        ydata = yaml.load(yfile)
 
-    for batch in ydata:
-        btype = batch.keys()[0]
-        if batch[btype]["enabled"] is True:
-            if btype == 'analysis':
-                try:
-                    batches['analysis'] = [batch["analysis"]]
-                except: #fix this
-                    batches['analysis'].append(batch['analysis'])
-            elif btype == 'thread_test':
-                 try:
-                    batches['thread_test'] = [batch["thread_test"]]
-                 except: #fix this
-                    batches['thread_test'].append(batch['thread_test'])
-            else:
-                print('Unrecogized batch type: "{}"'.format(btype))
+class Run:
+    def __init__(self,
+                 name,
+                 model_path,
+                 ntasks=1,
+                 output_path=None,
+                 yaml_path=None):
 
-            batches.append(analysis[y_object_name])
+        self.name = name
+        self.model_path = model_path
+        self.ntasks = ntasks
 
-    return batches
+        if output_path is None:
+            self.output_path = os.path.join(self.model_path, 'out')
+        else:
+            self.output_path = output_path
 
-def search_model_dir(model_path):
-    in_path = os.path.join(model_path, "in")
+        if yaml_path is None:
+            self.yaml_paths = self.search_model_dir()
+        else:
+            self.yaml_paths = [yaml_path]
 
-    in_files = os.listdir(in_path)
-    in_files = [os.path.join(in_path, infile) for infile in in_files]
+        self.batches = []
 
-    yaml_files = [infile for infile in in_files if infile.endswith(".yml")]
+    def read_batches(self):
+        pass
 
-    batches = {}
-    for yfile in yaml_files:
-        read_yaml(yfile, batches=batches)
+    def read_yaml(self):
+        with open(yaml_path, 'r') as yfile:
+            ydata = yaml.load(yfile)
 
-    return batches
+        for batch in ydata:
+            btype = batch.keys()[0]
+            if batch[btype]["enabled"] is True:
+                if btype == 'analysis':
+                    try:
+                        batches['analysis'] = [batch["analysis"]]
+                    except: #fix this
+                        batches['analysis'].append(batch['analysis'])
+                elif btype == 'thread_test':
+                     try:
+                        batches['thread_test'] = [batch["thread_test"]]
+                     except: #fix this
+                        batches['thread_test'].append(batch['thread_test'])
+                else:
+                    print('Unrecogized batch type: "{}"'.format(btype))
 
-def build_run_type(run_name, model_path, ntasks, outpath_base=None, yaml_path=None):
-    #create namedtuple containding batch data model path and run name
-    Run = namedtuple('Run', ['run_name', 'model_path', 'ntasks', 'batch_data'])
-    Analysis = namedtuple('Analysis', ['outpath', 'commands', 'analysis_data'])
+                batches.append(analysis[y_object_name])
 
-    if yaml_path is None:
-        batch_data = search_model_dir(model_path)
-    else:
-        batch_data = read_yaml(yaml_path)
+        return batches
 
-    for _, analysis_type in batch_data.items():
-        for name, analysis in analysis_type.itmes():
-            if outpath_base is None:
-                outpath = os.path.join(model_path, 'out', run_name, name)
-            else:
-                outpath = os.path.join(outpath_base, run_name, name)
+    def search_model_dir(self):
+        """Gets all yaml files from a directory"""
+        in_path = os.path.join(self.model_path, "in")
+        in_files = os.listdir(in_path)
+        in_files = [os.path.join(in_path, infile) for infile in in_files]
 
-            analysis = Analysis(outpath=outpath,
-                                commands=[],
-                                analysis_data=analysis)
+        return [infile for infile in in_files if infile.endswith(".yml")]
+        """
+        batches = {}
+        for yfile in yaml_files:
+            read_yaml(yfile, batches=batches)
 
-    currrent_run = Run(run_name=run_name,
-                       model_path=model_path,
-                       ntasks=ntasks,
-                       batch_data=batch_data)
+        return batches
+        """
 
-    return currrent_run
+class Batch:
+    """Base class for analysis and threadtest"""
 
-def format_command(model_path, analysis_data, unique):
-    command = analysis.analysis_data["command"]
-    inserts = {}
-    if '{exe}' in command:
-        inserts["exe"] = analysis_data["exe"]
-    if '{cpus}' in command:
-        inserts["cpus"] = analysis_data["cpus"]
-    if '{out}' in command:
-        inserts["out"] = analysis_data["out_path"]
-    if '{mod}' in command:
-        inserts["mod"] = run_data.model_path
-    if '{unique}' in command:
-        inserts["unique"] = unique
+    def __init__(self, yaml_data, model_path, out_path=None):
+        commands = []
 
-    return command.format(**inserts))
+        self.name = yaml_data['name']
+        self.command_base = yaml_data['command']
+        self.cpus = yaml_data['cpus']
+        self.unique = yaml_data['unique']
+        self.model_path = model_path
+
+        if out_path is None:
+            self.out_path = os.path.join(model_path, "out")
+        else:
+            self.out_path = out_path
+
+        self.executable = yaml_data['exe']
+        if not (os.path.isfile(fpath) and os.access(fpath, os.X_OK)):
+            raise InvalidExecutableError("")
+
+    def format_command(self, model_path, unique_item):
+        inserts = {}
+        if '{exe}' in self.command_base:
+            inserts["exe"] = self.executable
+        if '{cpus}' in self.command_base:
+            inserts["cpus"] = self.cpus
+        if '{out}' in self.command_base:
+            inserts["out"] = self.out_path #Implement this
+        if '{mod}' in self.command_base:
+            inserts["mod"] = run_data.model_path
+        if '{unique}' in self.command_base:
+            inserts["unique"] = unique
+
+         commands.append(command_base.format(**inserts))
+
+    def generate_unique(self, unique_path):
+        with open(unique_path, "r") as uni:
+            for line in uni:
+                yield line.split(",")[0].replace("\n", "")
+
+    def create_job_file(self, ntasks)
+        template = ""
+        with open("btemplate.sh", "r") as btemplate:
+            template = btemplate.readlines()
+
+        job_dir = os.path.join(self.out_path, 'jobs')
+        slurm_dir = os.path.join(self.out_path, 'slurm')
+        try:
+            os.makedirs(job_dir)
+            os.makedirs(slurm_dir)
+        except FileExistsError:
+            pass
+
+        file_count = 0
+        for count, com in enumerate(self.commands):
+            if count % ntasks == 0:
+                file_count += 1
+                job_name = "{name}-job-{count}".format(name=analysis["name"], count=file_count)
+
+                with open(os.path.join(analysis["job_dir"], ".".join([job_name, "sh"])), 'w') as bfile:
+                    for line in template: #Write Template file
+                        bfile.write(line) #
+
+                    #Write automated parameters to file
+                    bfile.write("#SBATCH -J {analysis}\n".format(analysis=self.name))
+                    bfile.write("#SBATCH --cpus-per-task={cpus}\n".format(cpus=self.cpus))
+                    bfile.write("#SBATCH -o {slurm}/{job_name}-%j.out\n".format(slurm=slurm_dir,
+                                                                                job_name=job_name))
+            #Clean up job name string formatting when files are opened
+            with open(os.path.join(analysis["job_dir"], "{}-job-{}.sh".format(self.name,
+                                                                              file_count)), 'a') as bfile:
+                bfile.write(com + '\n')
+                print(com)
+
+class Analysis(Batch):
+    def __init__(self):
+        pass
+
+    def create_commands(self, model_path, unique_path)
+        for unique_item in self.generate_unique(unique_path):
+            self.format_command(model_path, unique_item)
+
+class ThreadTest(Batch):
+    def __init__(self):
+        self.upper = yaml_data['upper']
+        self.lower = yaml_data['lower']
+
+    def create_commands(self, model_path):
+        for unique_item in self.generate_unique(unique_path):
+            for ncpu in range(self.lower, self.upper):
+                self.cpus = ncpu
+                self.format_command(model_path, unique_item)
 
 def create_commands_new(run_data):
 
     #Creates regular analysis commands
-    for name, analysis in run_data.batch_data["analysis"].items():
-        unique_path = os.path.join(run_data.model_path, 'in', analysis["unique"])
-        with open(unique_path, "r") as uni:
-            for count, line in enumerate(uni):
-                unique = line.split(",")[0].replace("\n", "")
-                analysis.commands.append(format_command(run_data.model_path,
-                                                        analysis.analysis_data,
-                                                        unique))
-
     #Creates thread test commands
-    for name, test in run_data.batch_data["thread_test"].items():
-        try:
-            unique_path = os.path.join(run_data.model_path, 'in', test["unique_path"])
-            with open(unique_path, "r") as uni:
-                for count, line in enumerate(uni):
-                    unique = line.split(",")[0].replace("\n", "")
-                    for ncpu in range(test.analysis_data["lower"], test.analysis_data["upper"]):
-                        test.analysis_data["cpus"] = ncpu
-                        analysis.commands.append(format_command(run_data.model_path,
-                                                                test.analysis_data,
-                                                                unique))
-    return run
 
 def create_job_files_new(run):
     """Creats sbatch files and puts them in their own folder"""
@@ -313,3 +371,35 @@ def main_new():
 
 if __name__ == "__main__":
     main()
+
+
+#OLD########################
+
+def build_run_type(run_name, model_path, ntasks, outpath_base=None, yaml_path=None):
+    #create namedtuple containding batch data model path and run name
+    Run = namedtuple('Run', ['run_name', 'model_path', 'ntasks', 'batch_data'])
+    Analysis = namedtuple('Analysis', ['outpath', 'commands', 'analysis_data'])
+
+    if yaml_path is None:
+        batch_data = search_model_dir(model_path)
+    else:
+        batch_data = read_yaml(yaml_path)
+
+    for _, analysis_type in batch_data.items():
+        for name, analysis in analysis_type.itmes():
+            if outpath_base is None:
+                outpath = os.path.join(model_path, 'out', run_name, name)
+            else:
+                outpath = os.path.join(outpath_base, run_name, name)
+
+            analysis = Analysis(outpath=outpath,
+                                commands=[],
+                                analysis_data=analysis)
+
+    currrent_run = Run(run_name=run_name,
+                       model_path=model_path,
+                       ntasks=ntasks,
+                       batch_data=batch_data)
+
+    return currrent_run
+
