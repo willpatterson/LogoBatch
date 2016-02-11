@@ -152,15 +152,16 @@ class Batch:
                 print(com)
 
 class Analysis(Batch):
-    def __init__(self):
-        pass
+    def __init__(self, yaml_data, model_path, out_path=None):
+        super().__init__(yaml_data, model_path, out_path)
 
     def create_commands(self, model_path, unique_path)
         for unique_item in self.generate_unique(unique_path):
             self.format_command(model_path, unique_item)
 
 class ThreadTest(Batch):
-    def __init__(self):
+    def __init__(self, yaml_data, model_path, out_path=None):
+        super().__init__(yaml_data, model_path, out_path)
         self.upper = yaml_data['upper']
         self.lower = yaml_data['lower']
 
