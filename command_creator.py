@@ -45,10 +45,19 @@ def search_model_dir(model_path):
 def build_run_type(run_name, model_path, yaml_path=None):
     #create namedtuple containding batch data model path and run name
     Run = namedtuple('Run', ['run_name', 'model_path', 'batch_data'])
+    Analysis = namedtuple('Analysis', ['outpath', 'commands', 'analysis_data'])
+
     if yaml_path is None:
         batch_data = search_model_dir(model_path)
     else:
         batch_data = read_yaml(yaml_path)
+
+    for _, analysis_type in batch_data.items():
+        for name, analysis in analysis_type.itmes():
+            outpath = os.path.join(model_path, 'out', run_name, name)
+            analysis = Analysis(outpath=outpath,
+                                commands=[],
+                                analysis_data=analysis)
 
     currrent_run = Run(run_name=run_name,
                        model_path=model_path,
@@ -57,7 +66,46 @@ def build_run_type(run_name, model_path, yaml_path=None):
     return currrent_run
 
 def create_commands_new(run_data):
-    pass
+    for name, analysis in run_data.batch_data["analysis"].items():
+        unique_path = os.path.join(run_data.model_path, 'in', analysis["unique"])
+        with open(unique_path, "r") as uni:
+            for count, line in enumerate(uni):
+                unique = line.split(",")[0].replace("\n", "")
+                analysis.commands.append(format_command(run_data.model_path,
+                                                        analysis.analysis_data,
+                                                        unique))
+
+    for name, test in run_data.batch_data["thread_test"].items():
+        try:
+            unique_path = os.path.join(run_data.model_path, 'in', test["unique_path"])
+            with open(unique_path, "r") as uni:
+                for count, line in enumerate(uni):
+                    unique = line.split(",")[0].replace("\n", "")
+                    for ncpu in range(test.analysis_data["lower"], test.analysis_data["upper"]):
+                        test.analysis_data["cpus"] = ncpu
+                        analysis.commands.append(format_command(run_data.model_path,
+                                                                test.analysis_data,
+                                                                unique))
+
+
+
+
+def format_command(model_path, analysis_data, unique):
+    command = analysis.analysis_data["command"]
+    inserts = {}
+    if '{exe}' in command:
+        inserts["exe"] = analysis_data["exe"]
+    if '{cpus}' in command:
+        inserts["cpus"] = analysis_data["cpus"]
+    if '{out}' in command:
+        inserts["out"] = analysis_data["out_path"]
+    if '{mod}' in command:
+        inserts["mod"] = run_data.model_path
+    if '{unique}' in command:
+        inserts["unique"] = unique
+
+    return command.format(**inserts))
+
 
 def create_commands(model_path, run_name):
     """opens yaml file from model directory and uses it to create ommands for slurm"""
@@ -133,7 +181,7 @@ def create_job_files(command_data, model_path, ntasks, run_name):
                     #Write automated parameters to file
                     bfile.write("#SBATCH -J {analysis}\n".format(analysis=analysis["name"]))
                     bfile.write("#SBATCH --cpus-per-task={cpus}\n".format(cpus=analysis["cpus"]))
-                    bfile.write("#SBATCH -o {slurm}/{job_name}%j.out\n".format(slurm=slurm_dir,
+                    bfile.write("#SBATCH -o {slurm}/{job_name}-%j.out\n".format(slurm=slurm_dir,
                                                                              job_name=job_name))
             #Clean up job name string formatting when files are opened
             with open(os.path.join(analysis["job_dir"], "{}-job-{}.sh".format(analysis["name"],
