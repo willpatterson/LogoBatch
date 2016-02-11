@@ -70,6 +70,22 @@ def build_run_type(run_name, model_path, ntasks, outpath_base=None, yaml_path=No
 
     return currrent_run
 
+def format_command(model_path, analysis_data, unique):
+    command = analysis.analysis_data["command"]
+    inserts = {}
+    if '{exe}' in command:
+        inserts["exe"] = analysis_data["exe"]
+    if '{cpus}' in command:
+        inserts["cpus"] = analysis_data["cpus"]
+    if '{out}' in command:
+        inserts["out"] = analysis_data["out_path"]
+    if '{mod}' in command:
+        inserts["mod"] = run_data.model_path
+    if '{unique}' in command:
+        inserts["unique"] = unique
+
+    return command.format(**inserts))
+
 def create_commands_new(run_data):
 
     #Creates regular analysis commands
@@ -96,25 +112,55 @@ def create_commands_new(run_data):
                                                                 unique))
     return run
 
+def create_job_files_new(run):
+    """Creats sbatch files and puts them in their own folder"""
+    template = ""
+    with open("btemplate.sh", "r") as btemplate:
+        template = btemplate.readlines()
 
+    for name, analysis in run.batch_data["analysis"].items():
+        job_dir = os.path.join(analysis.out_path, 'jobs')
+        slurm_dir = os.path.join(analysis.out_path, 'slurm')
+        try:
+            os.makedirs(job_dir)
+            os.makedirs(slurm_dir)
+        except FileExistsError:
+            pass
 
+        file_count = 0
+        for count, com in enumerate(analysis.commands):
+            if count % run.ntasks == 0:
+                file_count += 1
+                job_name = "{name}-job-{count}".format(name=analysis["name"], count=file_count)
 
-def format_command(model_path, analysis_data, unique):
-    command = analysis.analysis_data["command"]
-    inserts = {}
-    if '{exe}' in command:
-        inserts["exe"] = analysis_data["exe"]
-    if '{cpus}' in command:
-        inserts["cpus"] = analysis_data["cpus"]
-    if '{out}' in command:
-        inserts["out"] = analysis_data["out_path"]
-    if '{mod}' in command:
-        inserts["mod"] = run_data.model_path
-    if '{unique}' in command:
-        inserts["unique"] = unique
+                with open(os.path.join(analysis["job_dir"], ".".join([job_name, "sh"])), 'w') as bfile:
+                    for line in template: #Write Template file
+                        bfile.write(line) #
 
-    return command.format(**inserts))
+                    #Write automated parameters to file
+                    bfile.write("#SBATCH -J {analysis}\n".format(analysis=name]))
+                    bfile.write("#SBATCH --cpus-per-task={cpus}\n".format(cpus=analysis.analysis_data["cpus"]))
+                    bfile.write("#SBATCH -o {slurm}/{job_name}-%j.out\n".format(slurm=slurm_dir,
+                                                                                job_name=job_name))
+            #Clean up job name string formatting when files are opened
+            with open(os.path.join(analysis["job_dir"], "{}-job-{}.sh".format(name,
+                                                                              file_count)), 'a') as bfile:
+                bfile.write(com + '\n')
+                print(com)
 
+    return run
+
+def schedule_jobs_new(run):
+    """Schedules all of the batch files created in slurm"""
+
+    for analysis in :
+        print("asdfasdf")
+        print(analysis["job_dir"])
+        jobs = os.listdir(analysis["job_dir"])
+        jobs = [os.path.join(analysis["job_dir"], x) for x in jobs]
+
+        for job in jobs:
+            os.system("sbatch {}".format(job))
 
 def create_commands(model_path, run_name):
     """opens yaml file from model directory and uses it to create ommands for slurm"""
