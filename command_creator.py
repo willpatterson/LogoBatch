@@ -42,9 +42,9 @@ def search_model_dir(model_path):
 
     return batches
 
-def build_run_type(run_name, model_path, yaml_path=None):
+def build_run_type(run_name, model_path, ntasks, outpath_base=None, yaml_path=None):
     #create namedtuple containding batch data model path and run name
-    Run = namedtuple('Run', ['run_name', 'model_path', 'batch_data'])
+    Run = namedtuple('Run', ['run_name', 'model_path', 'ntasks', 'batch_data'])
     Analysis = namedtuple('Analysis', ['outpath', 'commands', 'analysis_data'])
 
     if yaml_path is None:
@@ -54,18 +54,25 @@ def build_run_type(run_name, model_path, yaml_path=None):
 
     for _, analysis_type in batch_data.items():
         for name, analysis in analysis_type.itmes():
-            outpath = os.path.join(model_path, 'out', run_name, name)
+            if outpath_base is None:
+                outpath = os.path.join(model_path, 'out', run_name, name)
+            else:
+                outpath = os.path.join(outpath_base, run_name, name)
+
             analysis = Analysis(outpath=outpath,
                                 commands=[],
                                 analysis_data=analysis)
 
     currrent_run = Run(run_name=run_name,
                        model_path=model_path,
+                       ntasks=ntasks,
                        batch_data=batch_data)
 
     return currrent_run
 
 def create_commands_new(run_data):
+
+    #Creates regular analysis commands
     for name, analysis in run_data.batch_data["analysis"].items():
         unique_path = os.path.join(run_data.model_path, 'in', analysis["unique"])
         with open(unique_path, "r") as uni:
@@ -75,6 +82,7 @@ def create_commands_new(run_data):
                                                         analysis.analysis_data,
                                                         unique))
 
+    #Creates thread test commands
     for name, test in run_data.batch_data["thread_test"].items():
         try:
             unique_path = os.path.join(run_data.model_path, 'in', test["unique_path"])
@@ -86,6 +94,7 @@ def create_commands_new(run_data):
                         analysis.commands.append(format_command(run_data.model_path,
                                                                 test.analysis_data,
                                                                 unique))
+    return run
 
 
 
@@ -221,12 +230,21 @@ def get_args():
                         "--ntasks",
                         type=int,
                         default=1,
-                        help="Number of tasks per batch")
+                        help="Number of tasks per slurm file")
     parser.add_argument("-r",
                         "--run_name",
                         type=str,
                         default=str(datetime.datetime.now().time()).replace(":", "-"),
                         help="Name of the batch run")
+    parser.add_argument("-i",
+                        "--input_path",
+                        type=str,
+                        default=None
+                        help="Specify an input path file outside of the model directory")
+    parser.add_argument("-o",
+                        "--output_path",
+                        default=None,
+                        help="Specify where to save output")
 
     return parser.parse_args()
 
@@ -235,6 +253,17 @@ def main():
     command_data = create_commands(args.model_path, args.run_name)
     command_data = create_job_files(command_data, args.model_path, args.ntasks, args.run_name)
     schedule_jobs(command_data)
+
+def main_new():
+    args = get_args()
+    run = build_run_type(args.model_path,
+                         args.run_name,
+                         outpath_base=args.output_path,
+                         yaml_path=args.yaml_path)
+    run = create_commands_new(run)
+    run = create_job_files_new(run)
+    schedule_jobs_new(run)
+
 
 if __name__ == "__main__":
     main()
