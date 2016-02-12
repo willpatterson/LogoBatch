@@ -215,7 +215,7 @@ class Batch:
         if '{mod}' in unique:
             inserts["mod"] = self.model_path
         if '{in}' in self.unique:
-            inserts["in"] = self.make_in()
+            inserts["in"] = os.path.join(self.model_path, 'in')
         unique = unique.format(**inserts)
 
         if not os.path.isfile(self.unique):
@@ -238,7 +238,7 @@ class Batch:
             inserts["mod"] = self.model_path
 
         if '{in}' in self.command_base:
-            inserts["in"] = self.make_in()
+            inserts["in"] = os.path.join(self.model_path, 'in')
         if '{unique}' in self.command_base:
             inserts["unique"] = unique_item
 
@@ -319,16 +319,6 @@ class Batch:
                     com = com.format(out=job_file_path)
                 bfile.write(com + '\n')
                 print(com)
-
-
-    #Might not need this
-    def make_in(self):
-        """
-        Returns standard 'in' directory.
-        this is used to reduce data redundency within the batches
-        """
-
-        return os.path.join(self.model_path, 'in')
 
     def schedule_batch(self):
         """Schedules the batches' job files in slurm"""
