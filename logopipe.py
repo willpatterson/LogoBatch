@@ -167,6 +167,7 @@ class Batch:
                 file_count += 1
                 job_name = "{name}-job-{count}".format(name=self.name, count=file_count)
                 job_file = os.path.join(job_dir, ".".join([job_name, "sh"]))
+                self.job_files.append(job_file)
 
                 with open(job_file, 'w') as bfile:
                     for line in template: #Write Template file
@@ -219,11 +220,6 @@ def schedule_jobs(command_data):
         for job in jobs:
             os.system("sbatch {}".format(job))
 
-def thread_test(batches):
-    for test in batches:
-        for ncpu in range(test["range"]["lower"], test["range"]["upper"]):
-            pass #left off here
-    pass
 
 def get_args():
     """Get arguments"""
