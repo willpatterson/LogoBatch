@@ -2,11 +2,15 @@
 Author: William Patterson
 """
 
-import os
 import yaml
 import argparse
 import datetime
 from collections import namedtuple
+
+import os, sys
+sys.path.append("..")
+
+from email_notice import Email
 
 class InvalidExecutableError(Exception):
     """Error thrown when executable doesn't exist"""
@@ -17,6 +21,11 @@ class InvalidBatchTypeError(Exception):
     """Error thrown when batch type isn't supported"""
     def __init__(self, message):
         super(InvalidBatchTypeError, self).__init__(message)
+
+class InvalidYAMLFormatError(Exception):
+    """Error thrown when yaml format is incorrect"""
+    def __init__(self, message):
+        super(InvalidYAMLFormatError, self).__init__(message)
 
 class NoUniqueFileFoundError(Exception):
     """Error when no unique file can be found"""
@@ -58,6 +67,7 @@ class Run:
             self.yaml_paths = [yaml_path]
 
         self.batches = []
+        self.email_info = {}
 
     #vvvvvvvvvvvvvvv Yaml file input Parsing vvvvvvvvvvvvvvvvvvvvvvvvvv
     def create_batches(self):
@@ -78,17 +88,20 @@ class Run:
             ydata = yaml.load(yfile)
 
         #TODO catch incorrect yml format error here
-        for batch in ydata:
+        for obj in ydata:
             try:
-                self.add_batch(batch)
+                self.add_batch(obj)
             except InvalidBatchTypeError:
-                btype = batch.keys()[0]
-                bname = batch[btype]['name']
-                print("Error: Batch type {bt} is invalid. Batch {bn} ignored".format(bt=btype,
-                                                                                     bn=bname))
+                otype = obj.keys()[0]
+
+                if oname == "email":
+                    self.email_info = obj[otype]
+
+                print("Error: Object type {otype} is invalid. Object ignored".format(otype=otype,
+                                                                                     oname=oname))
             except InvalidExecutableError:
-                btype = batch.keys()[0]
-                bname = batch[btype]['name']
+                btype = obj.keys()[0]
+                bname = obj[btype]['name']
                 exe = batch[btype]['exe']
                 print("Error: Executable {exe} is invalid. Batch {bn} ignored".format(exe=exe,
                                                                                       bn=bname))
@@ -109,6 +122,15 @@ class Run:
                 raise InvalidBatchTypeError("Batch type {btype} is invalid".format(btype))
 
             self.batches.append(batch)
+
+    def add_email_info(self, email_obj):
+        try:
+            if isinstance(email_obj, dict) is True:
+                if isinstance(email_obj["email"], dict) is True:
+                    if isinstance(email_obj["email"]["addresses"], list) is True:
+                        pass
+        except:
+            pass
 
     def _get_yaml_files(self):
         """Gets all yaml files from a directory"""
@@ -133,7 +155,7 @@ class Run:
         """Triggers Batch objects to create their job files"""
 
         for batch in self.batches:
-            batch.create_job_files(self.ntasks)
+            batch.create_job_files(self.ntasks, self.email_info)
 
     def schedule_batches(self):
         """Triggers Batch objects to schedule their job files"""
@@ -160,6 +182,11 @@ class Batch:
             self.unique_path = self.build_unique_path(yaml_data['unique'])
         except KeyError:
             self.unique_path = None
+
+        try:
+            self.email = yaml_data["email"]
+        except KeyError:
+            self.email = False
 
         if out_path is None:
             self.out_path = os.path.join(model_path, "out", self.name)
@@ -228,7 +255,7 @@ class Batch:
             for line in uni:
                 yield line.split(",")[0].replace("\n", "")
 
-    def create_job_file(self, ntasks):
+    def create_job_file(self, ntasks, email_info, run_name):
         """
         Creates job files from the batches' command list
         also populates the job_files list
@@ -250,6 +277,17 @@ class Batch:
         for count, com in enumerate(self.commands):
             if count % ntasks == 0:
                 file_count += 1
+
+                #Adds email lines
+                if self.email is True:
+                    email_objs = []
+                    for email in email_info["addresses"]
+                        email_objs.append(Email(email, job_name, self.name, run_name, slurm_file, out_path, ntasks))
+                    try:
+                        with open(job_file, 'a') as jfile:
+                            for email_obj in email_objs:
+                                jfile.write(generate_email_command() + '\n')
+
                 job_name = "{name}-job-{count}".format(name=self.name, count=file_count)
                 job_file = os.path.join(job_dir, ".".join([job_name, "sh"]))
                 self.job_files.append(job_file)
@@ -267,6 +305,7 @@ class Batch:
             with open(job_file, 'a') as bfile:
                 bfile.write(com + '\n')
                 print(com)
+
 
     #Might not need this
     def make_in(self):
@@ -359,8 +398,8 @@ def get_args():
                         type=str,
                         default=str(datetime.datetime.now().time()).replace(":", "-"),
                         help="Name of the batch run")
-    parser.add_argument("-i",
-                        "--input_path",
+    parser.add_argument("-y",
+                        "--yaml_path",
                         type=str,
                         default=None
                         help="Specify an input path file outside of the model directory")
@@ -373,7 +412,17 @@ def get_args():
 
 
 def main():
-    pass
+    args = get_args()
+    run = Run(args.run_name,
+              args.model_path,
+              ntasks=ntasks,
+              yaml_path=yaml_path,
+              output_path=output_path)
+
+    run.create_batches()
+    run.create_commands()
+    run.create_job_files()
+    run.schedule_batches()
 
 if __name__ == "__main__":
     main()
