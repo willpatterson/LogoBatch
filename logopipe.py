@@ -93,12 +93,17 @@ class Run:
         for batch in self.batches:
             batch.create_commands()
 
+    def create_slurm_jobs(self):
+        for batch in self.batches:
+            batch.create_job_files(self.ntasks)
+
 
 class Batch:
     """Base class for analysis and threadtest"""
 
     def __init__(self, yaml_data, model_path, out_path=None):
         commands = []
+        job_files = []
 
         self.name = yaml_data['name']
         self.command_base = yaml_data['command']
@@ -122,16 +127,18 @@ class Batch:
         inserts = {}
         if '{exe}' in self.command_base:
             inserts["exe"] = self.executable
-        if '{cpus}' in self.command_base:
-            inserts["cpus"] = self.cpus
         if '{out}' in self.command_base:
-            inserts["out"] = self.out_path #Implement this
-        if '{in}' in self.command_base:
-            inserts["in"] = self.make_in()
+            inserts["out"] = self.out_path
         if '{mod}' in self.command_base:
             inserts["mod"] = self.model_path
+
+        if '{in}' in self.command_base:
+            inserts["in"] = self.make_in()
         if '{unique}' in self.command_base:
             inserts["unique"] = unique_item
+
+        if '{cpus}' in self.command_base:
+            inserts["cpus"] = self.cpus
 
          commands.append(command_base.format(**inserts))
 
@@ -143,7 +150,7 @@ class Batch:
 
     def create_job_file(self, ntasks)
         template = ""
-        with open("btemplate.sh", "r") as btemplate:
+        with open("btemplate.sh", "r") as btemplate: #TODO implement different template options
             template = btemplate.readlines()
 
         job_dir = os.path.join(self.out_path, 'jobs')
@@ -158,9 +165,10 @@ class Batch:
         for count, com in enumerate(self.commands):
             if count % ntasks == 0:
                 file_count += 1
-                job_name = "{name}-job-{count}".format(name=analysis["name"], count=file_count)
+                job_name = "{name}-job-{count}".format(name=self.name, count=file_count)
+                job_file = os.path.join(job_dir, ".".join([job_name, "sh"]))
 
-                with open(os.path.join(analysis["job_dir"], ".".join([job_name, "sh"])), 'w') as bfile:
+                with open(job_file, 'w') as bfile:
                     for line in template: #Write Template file
                         bfile.write(line) #
 
@@ -170,21 +178,13 @@ class Batch:
                     bfile.write("#SBATCH -o {slurm}/{job_name}-%j.out\n".format(slurm=slurm_dir,
                                                                                 job_name=job_name))
             #Clean up job name string formatting when files are opened
-            with open(os.path.join(analysis["job_dir"], "{}-job-{}.sh".format(self.name,
-                                                                              file_count)), 'a') as bfile:
+            with open(job_file, 'a') as bfile:
                 bfile.write(com + '\n')
                 print(com)
 
-    #Private Methods
+    #Might not need this
     def make_in(self):
         return os.path.join(self.model_path, 'in')
-    #def make_out(self):
-    #    return os.path.join(self.model_path, 'out')
-    def make_job(self):
-        return os.path.join(self.out_path, 'job')
-    def make_slurm(self):
-        return os.path.join(self.out_path, 'slurm')
-
 
 class Analysis(Batch):
     def __init__(self, yaml_data, model_path, out_path=None):
