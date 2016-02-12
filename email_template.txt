@@ -1,0 +1,15 @@
+Job Name...: {jobn}
+
+Job Info:
+Run........: {run}
+Analysis...: {analysis}
+Output Path: {out}
+
+Terminate time.: {tt}
+Number of tasks: {ntasks}
+
+Errors Detected..: {err}
+Warnings Detected: {warn}
+
+
+
