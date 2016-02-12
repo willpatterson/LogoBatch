@@ -116,9 +116,13 @@ class Batch:
 
         self.name = yaml_data['name']
         self.command_base = yaml_data['command']
-        self.unique = self.build_unique_path(yaml_data['unique'])
         self.model_path = model_path
         self.cpus = 1
+
+        try:
+            self.unique_path = self.build_unique_path(yaml_data['unique'])
+        except KeyError:
+            self.unique_path = None
 
         if out_path is None:
             self.out_path = os.path.join(model_path, "out", self.name)
@@ -135,17 +139,17 @@ class Batch:
     def build_unique_path(self, unique):
         inserts = {}
         if '{mod}' in unique:
-            inserts["mod"] = model_path
+            inserts["mod"] = self.model_path
         if '{in}' in self.unique:
             inserts["in"] = self.make_in()
         unique = unique.format(**inserts)
 
         if not os.path.isfile(self.unique):
-            raise NoUniqueFileFoundError("message goes here")
+            raise NoUniqueFileFoundError("message goes here") #TODO add message
 
         return unique
 
-    def format_command(self, unique_item):
+    def format_command(self, unique_item=None):
         inserts = {}
         if '{exe}' in self.command_base:
             inserts["exe"] = self.executable
@@ -218,9 +222,9 @@ class Analysis(Batch):
         super().__init__(yaml_data, model_path, out_path)
         self.cpus = yaml_data['cpus']
 
-    def create_commands(self, model_path, unique_path)
-        for unique_item in self.generate_unique(unique_path):
-            self.format_command(model_path, unique_item)
+    def create_commands(self)
+        for unique_item in self.generate_unique(self.unique_path):
+            self.format_command(self.model_path, unique_item)
 
 class ThreadTest(Batch):
     def __init__(self, yaml_data, model_path, out_path=None):
@@ -228,11 +232,19 @@ class ThreadTest(Batch):
         self.upper = yaml_data['upper']
         self.cpus = yaml_data['lower']
 
-    def create_commands(self, unique_path):
-        for unique_item in self.generate_unique(unique_path):
-            for ncpu in range(self.lower, self.upper):
-                self.cpus = ncpu
-                self.format_command(model_path, unique_item)
+    def create_commands(self):
+        try:
+            for unique_item in self.generate_unique(self.unique_path):
+                for _ in generate_cpu_range():
+                    self.format_command(model_path, unique_item=unique_item)
+        except: #TODO add exception
+            for _ in generate_cpu_range():
+                self.format_command(model_path)
+
+    def generate_cpu_range():
+        for ncpu in range(self.lower, self.upper):
+            self.cpus = ncpu
+            yield
 
 
 def get_args():
