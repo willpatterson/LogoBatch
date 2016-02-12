@@ -245,7 +245,7 @@ class Batch:
         if '{cpus}' in self.command_base:
             inserts["cpus"] = self.cpus
 
-         commands.append(command_base.format(**inserts))
+        commands.append(command_base.format(**inserts))
 
     def generate_unique(self, unique_path):
         """Opens a file with unique entries and yields them"""
@@ -294,6 +294,8 @@ class Batch:
                         with open(job_file, 'a') as jfile:
                             for email_obj in email_objs:
                                 jfile.write(generate_email_command() + '\n')
+                    except: #TODO fix
+                        pass
 
                 job_name = "{name}-job-{count}".format(name=self.name, count=file_count)
                 job_out_path = os.path.join(out_path, job_name)
@@ -386,6 +388,7 @@ class ThreadTest(Batch):
 def get_args():
     """Get arguments"""
 
+    #TODO add defaults to help outputs
     parser = argparse.ArgumentParser(description="")
     parser.add_argument("-m",
                         "--model_path",
@@ -405,7 +408,7 @@ def get_args():
     parser.add_argument("-y",
                         "--yaml_path",
                         type=str,
-                        default=None
+                        default=None,
                         help="Specify an input path file outside of the model directory")
     parser.add_argument("-o",
                         "--output_path",
