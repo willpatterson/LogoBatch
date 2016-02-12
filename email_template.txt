@@ -1,11 +1,11 @@
-Job Name...: {jobn}
+Job Name...: {job_name}
 
 Job Info:
-Run........: {run}
-Analysis...: {analysis}
-Output Path: {out}
+Run........: {run_name}
+Batch......: {batch_name}
+Output Path: {out_path}
 
-Terminate time.: {tt}
+Terminate time.: {terminatet}
 Number of tasks: {ntasks}
 
 Errors Detected..: {err}
