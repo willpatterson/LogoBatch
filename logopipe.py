@@ -20,12 +20,24 @@ class NoUniqueFileFoundError(Exception):
         super(NoUniqueFileFoundError, self).__init__(message)
 
 class Run:
+    """
+    The run class contains and manages all Batch objects
+
+    The Run class is responsible for:
+       - parsing yaml files
+       - creating Batch objects from yaml data
+       - setting the base output path
+       - building Batch objects
+       - running Batch objects
+    """
+
     def __init__(self,
                  name,
                  model_path,
                  ntasks=1,
                  output_path=None,
                  yaml_path=None):
+        """Initalizes all class variables for run"""
 
         self.name = name
         self.model_path = model_path
@@ -44,12 +56,20 @@ class Run:
         self.batches = []
 
     #vvvvvvvvvvvvvvv Yaml file input Parsing vvvvvvvvvvvvvvvvvvvvvvvvvv
-    def read_batches(self):
+    def create_batches(self):
+        """Reads all yaml files into the Batch objects"""
+
         for yaml_path in self.yaml_paths:
             #TODO catch incorrect yml format error here
             self.read_yaml_file(yaml_path)
 
     def read_yaml_file(self, yaml_path):
+        """
+        Reads a single yaml file into the Run object
+         - Opens yaml file
+         - catches errors when creating a batch object
+        """
+
         with open(yaml_path, 'r') as yfile:
             ydata = yaml.load(yfile)
 
@@ -70,6 +90,11 @@ class Run:
                                                                                       bn=bname))
 
     def add_batch(self, batch):
+        """
+        Creates and the correct Batch object and adds it to the batch list
+        throws errors caught by read_yaml_file if format is not correct
+        """
+
         btype = batch.keys()[0]
         if batch[btype]["enabled"] is True:
             if btype == 'analysis':
@@ -83,6 +108,7 @@ class Run:
 
     def _get_yaml_files(self):
         """Gets all yaml files from a directory"""
+
         in_path = os.path.join(self.model_path, "in")
         in_files = os.listdir(in_path)
         in_files = [os.path.join(in_path, infile) for infile in in_files]
@@ -95,14 +121,19 @@ class Run:
 
     def create_commands(self):
         """Triggers batch objects to create their commands"""
+
         for batch in self.batches:
             batch.create_commands()
 
     def create_slurm_jobs(self):
+        """Triggers Batch objects to create their job files"""
+
         for batch in self.batches:
             batch.create_job_files(self.ntasks)
 
     def schedule_batches(self):
+        """Triggers Batch objects to schedule their job files"""
+
         for batch in self.batches:
             batch.schedule_batch()
 
@@ -111,6 +142,8 @@ class Batch:
     """Base class for analysis and threadtest"""
 
     def __init__(self, yaml_data, model_path, out_path=None):
+        """Init method attempts to build output and unquie paths"""
+
         commands = []
         job_files = []
 
@@ -134,9 +167,19 @@ class Batch:
             raise InvalidExecutableError("") #TODO add message
 
     def create_commands(self):
+        """
+        Virtual method that, when implemented, will create the
+        commands for the batch
+        """
+
         raise NotImplementedError()
 
     def build_unique_path(self, unique):
+        """
+        Builds a path for the unique file
+        Throws an error if unique path isn't valid
+        """
+
         inserts = {}
         if '{mod}' in unique:
             inserts["mod"] = self.model_path
@@ -150,6 +193,11 @@ class Batch:
         return unique
 
     def format_command(self, unique_item=None):
+        """
+        Formats a command from the base command with class variables
+        and adds them the the batches' command list
+        """
+
         inserts = {}
         if '{exe}' in self.command_base:
             inserts["exe"] = self.executable
@@ -170,11 +218,18 @@ class Batch:
 
     def generate_unique(self, unique_path):
         """Opens a file with unique entries and yields them"""
+        #TODO Possibly make this use the class variable
+
         with open(unique_path, "r") as uni:
             for line in uni:
                 yield line.split(",")[0].replace("\n", "")
 
-    def create_job_file(self, ntasks)
+    def create_job_file(self, ntasks):
+        """
+        Creates job files from the batches' command list
+        also populates the job_files list
+        """
+
         template = ""
         with open("btemplate.sh", "r") as btemplate: #TODO implement different template options
             template = btemplate.readlines()
@@ -211,28 +266,60 @@ class Batch:
 
     #Might not need this
     def make_in(self):
+        """
+        Returns standard 'in' directory.
+        this is used to reduce data redundency within the batches
+        """
+
         return os.path.join(self.model_path, 'in')
 
     def schedule_batch(self):
+        """Schedules the batches' job files in slurm"""
+
         for job_file in self.job_files:
             os.system("sbatch {}".format(job_files))
 
 class Analysis(Batch):
+    """ A Batch object with unique command parameters"""
+
     def __init__(self, yaml_data, model_path, out_path=None):
+        """Init fucntion adds the sets the cpu number"""
+        #TODO Possibly implement a default cpu number here
+
         super().__init__(yaml_data, model_path, out_path)
         self.cpus = yaml_data['cpus']
 
-    def create_commands(self)
+    def create_commands(self):
+        """Creates and adds commands with the format_command method"""
+
         for unique_item in self.generate_unique(self.unique_path):
             self.format_command(self.model_path, unique_item)
 
 class ThreadTest(Batch):
+    """
+    A batch object that is used to run identical commands with
+    a different numbers of CPUs or threads within a specified range
+
+    This Batch obejct is intended to figure out where the point of
+    deminishing returns related to the number of alloacted threads
+
+    Thread test objects can use also run thread test ranges with unique parameters
+    """
+
     def __init__(self, yaml_data, model_path, out_path=None):
+        """
+        Sets the self.upper class var
+        sets the self.cpus class var as lower. This is done to allow
+        ThreadTest batches to use the format_command method
+        """
+
         super().__init__(yaml_data, model_path, out_path)
         self.upper = yaml_data['upper']
         self.cpus = yaml_data['lower']
 
     def create_commands(self):
+        """Creats and adds commands to the batch"""
+
         try:
             for unique_item in self.generate_unique(self.unique_path):
                 for _ in generate_cpu_range():
@@ -242,6 +329,8 @@ class ThreadTest(Batch):
                 self.format_command()
 
     def generate_cpu_range():
+        """Changes the self.cpus class var and yields nothing"""
+
         for ncpu in range(self.cpus, self.upper):
             self.cpus = ncpu
             yield
@@ -249,6 +338,7 @@ class ThreadTest(Batch):
 
 def get_args():
     """Get arguments"""
+
     parser = argparse.ArgumentParser(description="")
     parser.add_argument("-m",
                         "--model_path",
@@ -276,7 +366,6 @@ def get_args():
                         help="Specify where to save output")
 
     return parser.parse_args()
-
 
 
 def main():
