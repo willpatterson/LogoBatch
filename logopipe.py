@@ -1,3 +1,7 @@
+"""
+Author: William Patterson
+"""
+
 import os
 import yaml
 import argparse
