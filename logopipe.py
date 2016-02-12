@@ -14,6 +14,11 @@ class InvalidBatchTypeError(Exception):
     def __init__(self, message):
         super(InvalidBatchTypeError, self).__init__(message)
 
+class NoUniqueFileFoundError(Exception):
+    """Error when no unique file can be found"""
+    def __init__(self, message):
+        super(NoUniqueFileFoundError, self).__init__(message)
+
 class Run:
     def __init__(self,
                  name,
@@ -97,6 +102,10 @@ class Run:
         for batch in self.batches:
             batch.create_job_files(self.ntasks)
 
+    def schedule_batches(self):
+        for batch in self.batches:
+            batch.schedule_batch()
+
 
 class Batch:
     """Base class for analysis and threadtest"""
@@ -107,7 +116,7 @@ class Batch:
 
         self.name = yaml_data['name']
         self.command_base = yaml_data['command']
-        self.unique = yaml_data['unique']
+        self.unique = self.build_unique_path(yaml_data['unique'])
         self.model_path = model_path
         self.cpus = 1
 
@@ -122,6 +131,19 @@ class Batch:
 
     def create_commands(self):
         raise NotImplementedError()
+
+    def build_unique_path(self, unique):
+        inserts = {}
+        if '{mod}' in unique:
+            inserts["mod"] = model_path
+        if '{in}' in self.unique:
+            inserts["in"] = self.make_in()
+        unique = unique.format(**inserts)
+
+        if not os.path.isfile(self.unique):
+            raise NoUniqueFileFoundError("message goes here")
+
+        return unique
 
     def format_command(self, unique_item):
         inserts = {}
@@ -187,6 +209,10 @@ class Batch:
     def make_in(self):
         return os.path.join(self.model_path, 'in')
 
+    def schedule_batch(self):
+        for job_file in self.job_files:
+            os.system("sbatch {}".format(job_files))
+
 class Analysis(Batch):
     def __init__(self, yaml_data, model_path, out_path=None):
         super().__init__(yaml_data, model_path, out_path)
@@ -207,18 +233,6 @@ class ThreadTest(Batch):
             for ncpu in range(self.lower, self.upper):
                 self.cpus = ncpu
                 self.format_command(model_path, unique_item)
-
-
-def schedule_jobs(command_data):
-    """Schedules all of the batch files created in slurm"""
-
-    for analysis in command_data:
-        print(analysis["job_dir"])
-        jobs = os.listdir(analysis["job_dir"])
-        jobs = [os.path.join(analysis["job_dir"], x) for x in jobs]
-
-        for job in jobs:
-            os.system("sbatch {}".format(job))
 
 
 def get_args():
