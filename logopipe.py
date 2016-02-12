@@ -242,7 +242,7 @@ class ThreadTest(Batch):
                 self.format_command(model_path)
 
     def generate_cpu_range():
-        for ncpu in range(self.lower, self.upper):
+        for ncpu in range(self.cpus, self.upper):
             self.cpus = ncpu
             yield
 
