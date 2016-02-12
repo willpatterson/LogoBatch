@@ -236,10 +236,10 @@ class ThreadTest(Batch):
         try:
             for unique_item in self.generate_unique(self.unique_path):
                 for _ in generate_cpu_range():
-                    self.format_command(model_path, unique_item=unique_item)
+                    self.format_command(unique_item=unique_item)
         except: #TODO add exception
             for _ in generate_cpu_range():
-                self.format_command(model_path)
+                self.format_command()
 
     def generate_cpu_range():
         for ncpu in range(self.cpus, self.upper):
