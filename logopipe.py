@@ -9,6 +9,11 @@ class InvalidExecutableError(Exception):
     def __init__(self, message):
         super(InvalidExecutableError, self).__init__(message)
 
+class InvalidBatchTypeError(Exception):
+    """Error thrown when batch type isn't supported"""
+    def __init__(self, message):
+        super(InvalidBatchTypeError, self).__init__(message)
+
 class Run:
     def __init__(self,
                  name,
@@ -22,58 +27,72 @@ class Run:
         self.ntasks = ntasks
 
         if output_path is None:
-            self.output_path = os.path.join(self.model_path, 'out')
+            self.output_path = os.path.join(self.model_path, 'out', self.name)
         else:
-            self.output_path = output_path
+            self.output_path = os.path.join(output_path, self.name)
 
         if yaml_path is None:
-            self.yaml_paths = self.search_model_dir()
+            self.yaml_paths = self._get_yaml_files()
         else:
             self.yaml_paths = [yaml_path]
 
         self.batches = []
 
+    #vvvvvvvvvvvvvvv Yaml file input Parsing vvvvvvvvvvvvvvvvvvvvvvvvvv
     def read_batches(self):
-        pass
+        for yaml_path in self.yaml_paths:
+            #TODO catch incorrect yml format error here
+            self.read_yaml_file(yaml_path)
 
-    def read_yaml(self):
+    def read_yaml_file(self, yaml_path):
         with open(yaml_path, 'r') as yfile:
             ydata = yaml.load(yfile)
 
+        #TODO catch incorrect yml format error here
         for batch in ydata:
-            btype = batch.keys()[0]
-            if batch[btype]["enabled"] is True:
-                if btype == 'analysis':
-                    try:
-                        batches['analysis'] = [batch["analysis"]]
-                    except: #fix this
-                        batches['analysis'].append(batch['analysis'])
-                elif btype == 'thread_test':
-                     try:
-                        batches['thread_test'] = [batch["thread_test"]]
-                     except: #fix this
-                        batches['thread_test'].append(batch['thread_test'])
-                else:
-                    print('Unrecogized batch type: "{}"'.format(btype))
+            try:
+                self.add_batch(batch)
+            except InvalidBatchTypeError:
+                btype = batch.keys()[0]
+                bname = batch[btype]['name']
+                print("Error: Batch type {bt} is invalid. Batch {bn} ignored".format(bt=btype,
+                                                                                     bn=bname))
+            except InvalidExecutableError:
+                btype = batch.keys()[0]
+                bname = batch[btype]['name']
+                exe = batch[btype]['exe']
+                print("Error: Executable {exe} is invalid. Batch {bn} ignored".format(exe=exe,
+                                                                                      bn=bname))
 
-                batches.append(analysis[y_object_name])
+    def add_batch(self, batch):
+        btype = batch.keys()[0]
+        if batch[btype]["enabled"] is True:
+            if btype == 'analysis':
+                batch = Analysis(batch[btype], model_path, out_path=self.out_path)
+            elif btype == 'thread_test':
+                batch = ThreadTest(batch[btype], model_path, out_path=self.out_path)
+            else:
+                raise InvalidBatchTypeError("Batch type {btype} is invalid".format(btype))
 
-        return batches
+            self.batches.append(batch)
 
-    def search_model_dir(self):
+    def _get_yaml_files(self):
         """Gets all yaml files from a directory"""
         in_path = os.path.join(self.model_path, "in")
         in_files = os.listdir(in_path)
         in_files = [os.path.join(in_path, infile) for infile in in_files]
 
         return [infile for infile in in_files if infile.endswith(".yml")]
-        """
-        batches = {}
-        for yfile in yaml_files:
-            read_yaml(yfile, batches=batches)
 
-        return batches
-        """
+    #^^^^^^^^^^^^^^^^^^ Yaml file input Parsing ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    #vvvvvvvvvvvvvvvvvvvvvvvvvv PipeLining vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
+    def create_commands(self):
+        """Triggers batch objects to create their commands"""
+        for batch in self.batches:
+            batch.create_commands()
+
 
 class Batch:
     """Base class for analysis and threadtest"""
@@ -88,15 +107,18 @@ class Batch:
         self.model_path = model_path
 
         if out_path is None:
-            self.out_path = os.path.join(model_path, "out")
+            self.out_path = os.path.join(model_path, "out", self.name)
         else:
-            self.out_path = out_path
+            self.out_path = os.path.join(out_path, self.name)
 
         self.executable = yaml_data['exe']
         if not (os.path.isfile(fpath) and os.access(fpath, os.X_OK)):
             raise InvalidExecutableError("") #TODO add message
 
-    def format_command(self, model_path, unique_item):
+    def create_commands(self):
+        raise NotImplementedError()
+
+    def format_command(self, unique_item):
         inserts = {}
         if '{exe}' in self.command_base:
             inserts["exe"] = self.executable
@@ -104,6 +126,8 @@ class Batch:
             inserts["cpus"] = self.cpus
         if '{out}' in self.command_base:
             inserts["out"] = self.out_path #Implement this
+        if '{in}' in self.command_base:
+            inserts["in"] = self.make_in()
         if '{mod}' in self.command_base:
             inserts["mod"] = self.model_path
         if '{unique}' in self.command_base:
@@ -151,6 +175,17 @@ class Batch:
                 bfile.write(com + '\n')
                 print(com)
 
+    #Private Methods
+    def make_in(self):
+        return os.path.join(self.model_path, 'in')
+    #def make_out(self):
+    #    return os.path.join(self.model_path, 'out')
+    def make_job(self):
+        return os.path.join(self.out_path, 'job')
+    def make_slurm(self):
+        return os.path.join(self.out_path, 'slurm')
+
+
 class Analysis(Batch):
     def __init__(self, yaml_data, model_path, out_path=None):
         super().__init__(yaml_data, model_path, out_path)
@@ -165,7 +200,7 @@ class ThreadTest(Batch):
         self.upper = yaml_data['upper']
         self.lower = yaml_data['lower']
 
-    def create_commands(self, model_path):
+    def create_commands(self, unique_path):
         for unique_item in self.generate_unique(unique_path):
             for ncpu in range(self.lower, self.upper):
                 self.cpus = ncpu
