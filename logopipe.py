@@ -232,8 +232,8 @@ class Batch:
         inserts = {}
         if '{exe}' in self.command_base:
             inserts["exe"] = self.executable
-        if '{out}' in self.command_base:
-            inserts["out"] = self.out_path
+        #if '{out}' in self.command_base:
+            #inserts["out"] = self.out_path
         if '{mod}' in self.command_base:
             inserts["mod"] = self.model_path
 
@@ -260,6 +260,7 @@ class Batch:
         Creates job files from the batches' command list
         also populates the job_files list
         """
+        #TODO Break this function up
 
         template = ""
         with open("btemplate.sh", "r") as btemplate: #TODO implement different template options
@@ -281,28 +282,41 @@ class Batch:
                 #Adds email lines
                 if self.email is True:
                     email_objs = []
-                    for email in email_info["addresses"]
-                        email_objs.append(Email(email, job_name, self.name, run_name, slurm_file, out_path, ntasks))
+                    for email in email_info["addresses"]:
+                        email_objs.append(Email(email,
+                                                job_name,
+                                                self.name,
+                                                run_name,
+                                                slurm_file,
+                                                out_path,
+                                                ntasks))
                     try:
                         with open(job_file, 'a') as jfile:
                             for email_obj in email_objs:
                                 jfile.write(generate_email_command() + '\n')
 
                 job_name = "{name}-job-{count}".format(name=self.name, count=file_count)
-                job_file = os.path.join(job_dir, ".".join([job_name, "sh"]))
-                self.job_files.append(job_file)
+                job_out_path = os.path.join(out_path, job_name)
+
+                slurm_file = "{job_name}-%j.out".format(job_name)
+                slurm_file_path = os.path.join(job_out_path, slurm_file)
+
+                job_file_path = os.path.join(job_out_path, ".".join([job_name, "sh"]))
+                self.job_files.append(job_file_path)
 
                 with open(job_file, 'w') as bfile:
                     for line in template: #Write Template file
                         bfile.write(line) #
 
                     #Write automated parameters to file
-                    bfile.write("#SBATCH -J {analysis}\n".format(analysis=self.name))
-                    bfile.write("#SBATCH --cpus-per-task={cpus}\n".format(cpus=self.cpus))
-                    bfile.write("#SBATCH -o {slurm}/{job_name}-%j.out\n".format(slurm=slurm_dir,
-                                                                                job_name=job_name))
+                    bfile.write("#SBATCH -J {analysis}\n".format(self.name))
+                    bfile.write("#SBATCH --cpus-per-task={cpus}\n".format(self.cpus))
+                    bfile.write("#SBATCH -o {slurm_file}\n".format(slurm_file_path))
+
             #Clean up job name string formatting when files are opened
             with open(job_file, 'a') as bfile:
+                if '{out}' in com:
+                    com = com.format(out=job_file_path)
                 bfile.write(com + '\n')
                 print(com)
 
