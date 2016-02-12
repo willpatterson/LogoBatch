@@ -107,9 +107,9 @@ class Batch:
 
         self.name = yaml_data['name']
         self.command_base = yaml_data['command']
-        self.cpus = yaml_data['cpus']
         self.unique = yaml_data['unique']
         self.model_path = model_path
+        self.cpus = 1
 
         if out_path is None:
             self.out_path = os.path.join(model_path, "out", self.name)
@@ -189,6 +189,7 @@ class Batch:
 class Analysis(Batch):
     def __init__(self, yaml_data, model_path, out_path=None):
         super().__init__(yaml_data, model_path, out_path)
+        self.cpus = yaml_data['cpus']
 
     def create_commands(self, model_path, unique_path)
         for unique_item in self.generate_unique(unique_path):
@@ -198,7 +199,7 @@ class ThreadTest(Batch):
     def __init__(self, yaml_data, model_path, out_path=None):
         super().__init__(yaml_data, model_path, out_path)
         self.upper = yaml_data['upper']
-        self.lower = yaml_data['lower']
+        self.cpus = yaml_data['lower']
 
     def create_commands(self, unique_path):
         for unique_item in self.generate_unique(unique_path):
