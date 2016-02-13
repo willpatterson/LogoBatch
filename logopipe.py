@@ -131,7 +131,7 @@ class Run:
             elif batch.name == 'thread_test':
                 batch = ThreadTest(batch.data, self.model_path, out_path=self.out_path)
             else:
-                raise InvalidBatchTypeError("Batch type {btype} is invalid".format(batch.name))
+                raise InvalidBatchTypeError("Batch type {btype} is invalid".format(btype=batch.name))
 
             self.batches.append(batch)
         else:
@@ -315,7 +315,7 @@ class Batch:
                 job_name = "{name}-job-{count}".format(name=self.name, count=file_count)
                 job_out_path = os.path.join(out_path, job_name)
 
-                slurm_file = "{job_name}-%j.out".format(job_name)
+                slurm_file = "{job_name}-%j.out".format(job_name=job_name)
                 slurm_file_path = os.path.join(job_out_path, slurm_file)
 
                 job_file_path = os.path.join(job_out_path, ".".join([job_name, "sh"]))
@@ -326,9 +326,9 @@ class Batch:
                         bfile.write(line) #
 
                     #Write automated parameters to file
-                    bfile.write("#SBATCH -J {analysis}\n".format(self.name))
-                    bfile.write("#SBATCH --cpus-per-task={cpus}\n".format(self.cpus))
-                    bfile.write("#SBATCH -o {slurm_file}\n".format(slurm_file_path))
+                    bfile.write("#SBATCH -J {analysis}\n".format(analysis=self.name))
+                    bfile.write("#SBATCH --cpus-per-task={cpus}\n".format(cpus=self.cpus))
+                    bfile.write("#SBATCH -o {slurm_file}\n".format(slurm_file=slurm_file_path))
 
             #Clean up job name string formatting when files are opened
             with open(job_file, 'a') as bfile:
@@ -341,7 +341,7 @@ class Batch:
         """Schedules the batches' job files in slurm"""
 
         for job_file in self.job_files:
-            os.system("sbatch {}".format(job_files))
+            os.system("sbatch {job}".format(job=job_file))
 
 class Analysis(Batch):
     """ A Batch object with unique command parameters"""
