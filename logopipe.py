@@ -90,12 +90,12 @@ class Run:
         #Converts yaml nested dictionaries into namedtuples
         YmlObj = namedtuple('YmlObj', ['name', 'data'])
         ydata = []
-        for obj in raw_ydata:
+        for y_obj in raw_ydata:
             try:
-                if not (len(obj.keys()) > 1):
-                    for key in obj.keys():
+                if not (len(y_obj.keys()) > 1):
+                    for key in y_obj.keys():
                         name = key
-                    ydata.append(YmlObj(name=name, data=obj[name]))
+                    ydata.append(YmlObj(name=name, data=y_obj[name]))
                 else:
                     print("Error: Invalid object format.. to many object names. Skipping")
             except AttributeError:
@@ -105,15 +105,15 @@ class Run:
         for y_obj in ydata:
             try:
                 if y_obj == "email":
-                    self.email_info = obj.data
+                    self.email_info = y_obj.data
                 else:
-                    self.add_batch(obj)
+                    self.add_batch(y_obj)
 
             except InvalidBatchTypeError:
-                print("Error: Object type {otype} is invalid. Object ignored".format(otype=obj.name)
+                print("Error: Object type {otype} is invalid. Object ignored".format(otype=y_obj.name))
             except InvalidExecutableError:
-                print("Error: Executable {exe} is invalid. Batch {bn} ignored".format(exe=obj.data["exe"],
-                                                                                      bn=obj.name))
+                print("Error: Executable {exe} is invalid. Batch {bn} ignored".format(exe=y_obj.data["exe"],
+                                                                                      bn=y_obj.name))
 
     def add_batch(self, batch):
         """
@@ -135,6 +135,7 @@ class Run:
 
             self.batches.append(batch)
         else:
+            print("Ignoring: {name}".format(batch.data["name"]))
 
     def add_email_info(self, email_obj):
         try:
