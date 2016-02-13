@@ -135,7 +135,7 @@ class Run:
 
             self.batches.append(batch)
         else:
-            print("Ignoring: {name}".format(batch.data["name"]))
+            print("Ignoring: {name}".format(name=batch.name))
 
     def add_email_info(self, email_obj):
         try:
