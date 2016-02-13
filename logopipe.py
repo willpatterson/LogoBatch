@@ -85,43 +85,56 @@ class Run:
         """
 
         with open(yaml_path, 'r') as yfile:
-            ydata = yaml.load(yfile)
+            raw_ydata = yaml.load(yfile)
+
+        #Converts yaml nested dictionaries into namedtuples
+        YmlObj = namedtuple('YmlObj', ['name', 'data'])
+        ydata = []
+        for obj in raw_ydata:
+            try:
+                if !(len(obj.keys()) > 1):
+                    for key in obj.keys():
+                        name = key
+                    ydata.append(YmlObj(name=name, data=obj[name]))
+                else:
+                    print("Error: Invalid object format.. to many object names. Skipping")
+            except AttributeError:
+                print("Error: Invalid object format.. object not a dictionary. Sikpping")
 
         #TODO catch incorrect yml format error here
-        for obj in ydata:
+        for y_obj in ydata:
             try:
-                self.add_batch(obj)
+                if y_obj == "email":
+                    self.email_info = obj.data
+                else:
+                    self.add_batch(obj)
+
             except InvalidBatchTypeError:
-                otype = obj.keys()[0]
-
-                if oname == "email":
-                    self.email_info = obj[otype]
-
-                print("Error: Object type {otype} is invalid. Object ignored".format(otype=otype,
-                                                                                     oname=oname))
+                print("Error: Object type {otype} is invalid. Object ignored".format(otype=obj.name)
             except InvalidExecutableError:
-                btype = obj.keys()[0]
-                bname = obj[btype]['name']
-                exe = batch[btype]['exe']
-                print("Error: Executable {exe} is invalid. Batch {bn} ignored".format(exe=exe,
-                                                                                      bn=bname))
+                print("Error: Executable {exe} is invalid. Batch {bn} ignored".format(exe=obj.data["exe"],
+                                                                                      bn=obj.name))
 
     def add_batch(self, batch):
         """
         Creates and the correct Batch object and adds it to the batch list
         throws errors caught by read_yaml_file if format is not correct
         """
+        try:
+            add_flag = batch.data["enabled"]
+        except KeyError:
+            add_flag = True
 
-        btype = batch.keys()[0]
-        if batch[btype]["enabled"] is True:
-            if btype == 'analysis':
-                batch = Analysis(batch[btype], model_path, out_path=self.out_path)
-            elif btype == 'thread_test':
-                batch = ThreadTest(batch[btype], model_path, out_path=self.out_path)
+        if add_flag is True:
+            if batch.name == 'analysis':
+                batch = Analysis(batch.data, self.model_path, out_path=self.out_path)
+            elif batch.name == 'thread_test':
+                batch = ThreadTest(batch.data, self.model_path, out_path=self.out_path)
             else:
-                raise InvalidBatchTypeError("Batch type {btype} is invalid".format(btype))
+                raise InvalidBatchTypeError("Batch type {btype} is invalid".format(batch.name))
 
             self.batches.append(batch)
+        else:
 
     def add_email_info(self, email_obj):
         try:
