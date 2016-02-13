@@ -395,10 +395,10 @@ class ThreadTest(Batch):
                 for _ in generate_cpu_range():
                     self.format_command(unique_item=unique_item)
         except: #TODO add exception
-            for _ in generate_cpu_range():
+            for _ in self.generate_cpu_range():
                 self.format_command()
 
-    def generate_cpu_range():
+    def generate_cpu_range(self):
         """Changes the self.cpus class var and yields nothing"""
 
         for ncpu in range(self.cpus, self.upper):
