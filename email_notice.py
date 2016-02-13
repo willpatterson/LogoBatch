@@ -23,7 +23,7 @@ class Email:
                             "terminatet": datetime.datetime.now()}
 
         self.body = ""
-        self.add_message(message_type)
+        self.add_message()
 
         self.msg = MIMEMultipart()
         self.msg["To"] = address
