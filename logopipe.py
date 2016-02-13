@@ -184,8 +184,8 @@ class Batch:
     def __init__(self, yaml_data, model_path, out_path=None):
         """Init method attempts to build output and unquie paths"""
 
-        commands = []
-        job_files = []
+        self.commands = []
+        self.job_files = []
 
         self.name = yaml_data['name']
         self.command_base = yaml_data['command']
@@ -263,7 +263,7 @@ class Batch:
         if '{cpus}' in self.command_base:
             inserts["cpus"] = self.cpus
 
-        commands.append(command_base.format(**inserts))
+        self.commands.append(self.command_base.format(**inserts))
 
     def generate_unique(self, unique_path):
         """Opens a file with unique entries and yields them"""
@@ -306,7 +306,7 @@ class Batch:
                                                 self.name,
                                                 run_name,
                                                 slurm_file,
-                                                out_path,
+                                                job_out_path,
                                                 ntasks))
                     try:
                         with open(job_file, 'a') as jfile:
@@ -316,7 +316,7 @@ class Batch:
                         pass
 
                 job_name = "{name}-job-{count}".format(name=self.name, count=file_count)
-                job_out_path = os.path.join(out_path, job_name)
+                job_out_path = os.path.join(self.out_path, job_name)
 
                 slurm_file = "{job_name}-%j.out".format(job_name=job_name)
                 slurm_file_path = os.path.join(job_out_path, slurm_file)
@@ -324,7 +324,7 @@ class Batch:
                 job_file_path = os.path.join(job_out_path, ".".join([job_name, "sh"]))
                 self.job_files.append(job_file_path)
 
-                with open(job_file, 'w') as bfile:
+                with open(job_file_path, 'w') as bfile:
                     for line in template: #Write Template file
                         bfile.write(line) #
 
@@ -334,7 +334,7 @@ class Batch:
                     bfile.write("#SBATCH -o {slurm_file}\n".format(slurm_file=slurm_file_path))
 
             #Clean up job name string formatting when files are opened
-            with open(job_file, 'a') as bfile:
+            with open(job_file_path, 'a') as bfile:
                 if '{out}' in com:
                     com = com.format(out=job_file_path)
                 bfile.write(com + '\n')
