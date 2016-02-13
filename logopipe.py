@@ -422,9 +422,9 @@ def main():
     args = get_args()
     run = Run(args.run_name,
               args.model_path,
-              ntasks=ntasks,
-              yaml_path=yaml_path,
-              output_path=output_path)
+              ntasks=args.ntasks,
+              yaml_path=args.yaml_path,
+              output_path=args.output_path)
 
     run.create_batches()
     run.create_commands()
