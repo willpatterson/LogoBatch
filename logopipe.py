@@ -363,7 +363,7 @@ class Analysis(Batch):
         """Creates and adds commands with the format_command method"""
 
         for unique_item in self.generate_unique(self.unique_path):
-            self.format_command(self.model_path, unique_item)
+            self.format_command(unique_item=unique_item)
 
 class ThreadTest(Batch):
     """
