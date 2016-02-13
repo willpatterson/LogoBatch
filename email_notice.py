@@ -1,7 +1,10 @@
+import datetime
+import os
+import argparse
 import smtplib
 import socket
 
-from email.mime.multipart import MIMEMulitpart
+from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 class Email:
@@ -73,7 +76,7 @@ class Email:
         self.msg.attach(attachment)
 
 def get_args():
-    parser = ArgumentParser(description="")
+    parser = argparse.ArgumentParser(description="")
     parser.add_argument("address", type=str, help="Email address")
     parser.add_argument("job_name", type=str, help="Job name")
     parser.add_argument("batch_name", type=str, help="Batch name")
