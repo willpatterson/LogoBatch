@@ -449,7 +449,7 @@ def main():
 
     run.create_batches()
     run.create_commands()
-    run.create_job_files()
+    run.create_slurm_jobs()
     run.schedule_batches()
 
 if __name__ == "__main__":
