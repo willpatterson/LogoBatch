@@ -208,8 +208,9 @@ class Batch:
             self.out_path = os.path.join(out_path, self.name)
 
         self.executable = yaml_data['exe']
-        if not (os.path.isfile(fpath) and os.access(fpath, os.X_OK)):
+        if not (os.path.isfile(self.executable) and os.access(self.executable, os.X_OK)):
             raise InvalidExecutableError("") #TODO add message
+        #TODO add case for command in path
 
     def create_commands(self):
         """
@@ -350,7 +351,10 @@ class Analysis(Batch):
         #TODO Possibly implement a default cpu number here
 
         super().__init__(yaml_data, model_path, out_path)
-        self.cpus = yaml_data['cpus']
+        try:
+            self.cpus = yaml_data['cpus']
+        except KeyError:
+            self.cpus = 1
 
     def create_commands(self):
         """Creates and adds commands with the format_command method"""
