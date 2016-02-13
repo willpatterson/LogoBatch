@@ -92,7 +92,7 @@ class Run:
         ydata = []
         for obj in raw_ydata:
             try:
-                if !(len(obj.keys()) > 1):
+                if not (len(obj.keys()) > 1):
                     for key in obj.keys():
                         name = key
                     ydata.append(YmlObj(name=name, data=obj[name]))
