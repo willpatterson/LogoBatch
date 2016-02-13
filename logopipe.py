@@ -192,9 +192,12 @@ class Batch:
         self.model_path = model_path
         self.cpus = 1
 
-        try:
-            self.unique_path = self.build_unique_path(yaml_data['unique'])
-        except KeyError:
+        if '{unique}' in self.command_base:
+            try:
+                self.unique_path = self.build_unique_path(yaml_data['unique'])
+            except KeyError:
+                raise NoUniqueFileFoundError("No 'unique' file was specifed in your yaml object but {unique} was found in your command")
+        else:
             self.unique_path = None
 
         try:
@@ -229,7 +232,7 @@ class Batch:
         inserts = {}
         if '{mod}' in unique:
             inserts["mod"] = self.model_path
-        if '{in}' in self.unique:
+        if '{in}' in self.unique_path:
             inserts["in"] = os.path.join(self.model_path, 'in')
         unique = unique.format(**inserts)
 
