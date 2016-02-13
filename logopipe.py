@@ -236,7 +236,7 @@ class Batch:
             inserts["in"] = os.path.join(self.model_path, 'in')
         unique = unique.format(**inserts)
 
-        if not os.path.isfile(self.unique):
+        if not os.path.isfile(self.unique_path):
             raise NoUniqueFileFoundError("message goes here") #TODO add message
 
         return unique
