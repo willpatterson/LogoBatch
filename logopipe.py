@@ -48,7 +48,7 @@ class Run:
                  name,
                  model_path,
                  ntasks=1,
-                 output_path=None,
+                 out_path=None,
                  yaml_path=None):
         """Initalizes all class variables for run"""
 
@@ -56,10 +56,10 @@ class Run:
         self.model_path = model_path
         self.ntasks = ntasks
 
-        if output_path is None:
-            self.output_path = os.path.join(self.model_path, 'out', self.name)
+        if out_path is None:
+            self.out_path = os.path.join(self.model_path, 'out', self.name)
         else:
-            self.output_path = os.path.join(output_path, self.name)
+            self.out_path = os.path.join(out_path, self.name)
 
         if yaml_path is None:
             self.yaml_paths = self._get_yaml_files()
@@ -438,7 +438,7 @@ def main():
               args.model_path,
               ntasks=args.ntasks,
               yaml_path=args.yaml_path,
-              output_path=args.output_path)
+              out_path=args.output_path)
 
     run.create_batches()
     run.create_commands()
