@@ -223,11 +223,11 @@ class Batch:
         inserts = {}
         if '{mod}' in unique:
             inserts["mod"] = self.model_path
-        if '{in}' in self.unique_path:
+        if '{in}' in unique:
             inserts["in"] = os.path.join(self.model_path, 'in')
         unique = unique.format(**inserts)
 
-        if not os.path.isfile(self.unique_path):
+        if not os.path.isfile(unique):
             raise NoUniqueFileFoundError("message goes here") #TODO add message
 
         return unique
@@ -329,7 +329,7 @@ class Batch:
                     try:
                         with open(job_file, 'a') as jfile:
                             for email_obj in email_objs:
-                                jfile.write(generate_email_command() + '\n')
+                                jfile.write(email_objs.generate_email_command() + '\n')
                     except: #TODO fix
                         pass
 
