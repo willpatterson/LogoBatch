@@ -292,12 +292,42 @@ class Batch:
         except FileExistsError:
             pass
 
-        file_count = 0
-        for count, com in enumerate(self.commands):
-            if count % ntasks == 0:
-                file_count += 1
+        count = 0
+        while count > len(self.commands):
+            job_name = "{name}-job-{count}".format(name=self.name, count=file_count)
+            job_out_path = os.path.join(self.out_path, job_name)
 
-                #Adds email lines
+            slurm_file = "{job_name}-%j.out".format(job_name=job_name)
+            slurm_file_path = os.path.join(job_out_path, slurm_file)
+
+            job_file_path = os.path.join(job_out_path, ".".join([job_name, "sh"]))
+            self.job_files.append(job_file_path)
+
+            with open(job_file_path, 'w') as bfile:
+                #Write Slurm settings to slurm batch file #############################
+                for line in template: #Write Template file
+                    bfile.write(line) #
+
+                #Write automated parameters to file
+                bfile.write("#SBATCH -J {analysis}\n".format(analysis=self.name))
+                bfile.write("#SBATCH --cpus-per-task={cpus}\n".format(cpus=self.cpus))
+                bfile.write("#SBATCH -o {slurm_file}\n".format(slurm_file=slurm_file_path))
+
+                #Write commands#########################################################
+                try:
+                    for _ in range(3):
+                        command = self.commands[count]
+                        if '{out}' in command:
+                            command = command.format(out=job_file_path)
+                        bfile.write(command + '\n')
+
+                        self.commands[count] = command
+                        print(command)
+                        count += 1
+                except IndexError:
+                    pass #TODO investigate
+
+                #Write email commands ####################################################
                 if self.email is True:
                     email_objs = []
                     for email in email_info["addresses"]:
@@ -315,30 +345,7 @@ class Batch:
                     except: #TODO fix
                         pass
 
-                job_name = "{name}-job-{count}".format(name=self.name, count=file_count)
-                job_out_path = os.path.join(self.out_path, job_name)
 
-                slurm_file = "{job_name}-%j.out".format(job_name=job_name)
-                slurm_file_path = os.path.join(job_out_path, slurm_file)
-
-                job_file_path = os.path.join(job_out_path, ".".join([job_name, "sh"]))
-                self.job_files.append(job_file_path)
-
-                with open(job_file_path, 'w') as bfile:
-                    for line in template: #Write Template file
-                        bfile.write(line) #
-
-                    #Write automated parameters to file
-                    bfile.write("#SBATCH -J {analysis}\n".format(analysis=self.name))
-                    bfile.write("#SBATCH --cpus-per-task={cpus}\n".format(cpus=self.cpus))
-                    bfile.write("#SBATCH -o {slurm_file}\n".format(slurm_file=slurm_file_path))
-
-            #Clean up job name string formatting when files are opened
-            with open(job_file_path, 'a') as bfile:
-                if '{out}' in com:
-                    com = com.format(out=job_file_path)
-                bfile.write(com + '\n')
-                print(com)
 
     def schedule_batch(self):
         """Schedules the batches' job files in slurm"""
