@@ -241,8 +241,8 @@ class Batch:
         inserts = {}
         if '{exe}' in self.command_base:
             inserts["exe"] = self.executable
-        #if '{out}' in self.command_base:
-            #inserts["out"] = self.out_path
+        if '{out}' in self.command_base:
+            inserts["out"] = '{out}'
         if '{mod}' in self.command_base:
             inserts["mod"] = self.model_path
 
