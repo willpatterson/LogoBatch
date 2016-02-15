@@ -137,15 +137,6 @@ class Run:
         else:
             print("Ignoring: {name}".format(name=batch.name))
 
-    def add_email_info(self, email_obj):
-        try:
-            if isinstance(email_obj, dict) is True:
-                if isinstance(email_obj["email"], dict) is True:
-                    if isinstance(email_obj["email"]["addresses"], list) is True:
-                        pass
-        except:
-            pass
-
     def _get_yaml_files(self):
         """Gets all yaml files from a directory"""
 
