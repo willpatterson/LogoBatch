@@ -104,7 +104,7 @@ class Run:
         #TODO catch incorrect yml format error here
         for y_obj in ydata:
             try:
-                if y_obj == "email":
+                if y_obj.name == "email":
                     self.email_info = y_obj.data
                 else:
                     self.add_batch(y_obj)
@@ -113,7 +113,7 @@ class Run:
                 print("Error: Object type {otype} is invalid. Object ignored".format(otype=y_obj.name))
             except InvalidExecutableError:
                 print("Error: Executable {exe} is invalid. Batch {bn} ignored".format(exe=y_obj.data["exe"],
-                                                                                      bn=y_obj.name))
+                                                                                      bn=y_obj.data["name"]))
 
     def add_batch(self, batch):
         """
@@ -160,7 +160,7 @@ class Run:
         """Triggers Batch objects to create their job files"""
 
         for batch in self.batches:
-            batch.create_job_files(self.ntasks, self.email_info)
+            batch.create_job_file(self.ntasks, self.email_info, self.name)
 
     def schedule_batches(self):
         """Triggers Batch objects to schedule their job files"""
