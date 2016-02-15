@@ -278,20 +278,12 @@ class Batch:
         Creates job files from the batches' command list
         also populates the job_files list
         """
-        #TODO Break this function up
 
         template = ""
         with open("btemplate.sh", "r") as btemplate: #TODO implement different template options
             template = btemplate.readlines()
 
-        job_dir = os.path.join(self.out_path, 'jobs')
-        slurm_dir = os.path.join(self.out_path, 'slurm')
-        try:
-            os.makedirs(job_dir)
-            os.makedirs(slurm_dir)
-        except FileExistsError:
-            pass
-
+        file_count = 0
         count = 0
         while count > len(self.commands):
             job_name = "{name}-job-{count}".format(name=self.name, count=file_count)
@@ -302,6 +294,11 @@ class Batch:
 
             job_file_path = os.path.join(job_out_path, ".".join([job_name, "sh"]))
             self.job_files.append(job_file_path)
+
+            try:
+                os.makedirs(job_out_path)
+            except FileExistsError:
+                pass
 
             with open(job_file_path, 'w') as bfile:
                 #Write Slurm settings to slurm batch file #############################
@@ -325,7 +322,7 @@ class Batch:
                         print(command)
                         count += 1
                 except IndexError:
-                    pass #TODO investigate
+                    pass
 
                 #Write email commands ####################################################
                 if self.email is True:
@@ -344,6 +341,8 @@ class Batch:
                                 jfile.write(generate_email_command() + '\n')
                     except: #TODO fix
                         pass
+
+            file_count += 1
 
 
 
