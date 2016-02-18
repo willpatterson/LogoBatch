@@ -2,7 +2,7 @@
     name: "OneWaySA"
     enabled: false
     email: false
-    command: "{exe} --model {mod}BUPwithMUASimple1.nlogo --experiment {unique} --table {out}/{unique}.out --threads {cpus}"
+    command: "{exe} --model {mod}/BUPwithMUASimple1.nlogo --experiment {unique} --table {out}/{unique}.out --threads {cpus}"
     exe:     "/share/apps/user/stow/netlogo-5.2.1/netlogo-headless.sh"
     unique:  "{in}/OneWaySA77.csv"
     cpus: 5
@@ -15,7 +15,6 @@
     exe: "/share/apps/user/stow/netlogo-5.2.1/behaviorsearch/behaviorsearch_headless.sh"
     unique: "{in}/bsearchSA.csv"
     cpus: 5
-
 
 - thread_test:
     name: "BsearchTTest"
@@ -32,9 +31,9 @@
     name: "Example"
     enabled: true
     command: "{exe} {unique}"
-    exe: "sleep"
+    exe: "/bin/sleep"
     unquie: "sleeptimes.txt"
 
 - email: 
     addresses: ["wpatt2"]
-    enabled_batches: ["Example"]
+    #enabled_batches: ["Example"] not yet supported

@@ -276,9 +276,10 @@ class Batch:
 
         file_count = 0
         count = 0
-        while count > len(self.commands):
+        while count < len(self.commands):
             job_name = "{name}-job-{count}".format(name=self.name, count=file_count)
             job_out_path = os.path.join(self.out_path, job_name)
+            print(job_out_path)
 
             slurm_file = "{job_name}-%j.out".format(job_name=job_name)
             slurm_file_path = os.path.join(job_out_path, slurm_file)
@@ -303,14 +304,13 @@ class Batch:
 
                 #Write commands#########################################################
                 try:
-                    for _ in range(3):
+                    for _ in range(ntasks):
                         command = self.commands[count]
                         if '{out}' in command:
-                            command = command.format(out=job_file_path)
+                            command = command.format(out=job_out_path)
                         bfile.write(command + '\n')
 
                         self.commands[count] = command
-                        print(command)
                         count += 1
                 except IndexError:
                     pass

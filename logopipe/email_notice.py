@@ -23,14 +23,15 @@ class Email:
                             "terminatet": datetime.datetime.now()}
 
         self.body = ""
-        self.add_message()
 
+        print(self.insert_data)
         self.msg = MIMEMultipart()
         self.msg["To"] = address
-        self.msg["Subject"] = "Job: {job_name} has terminated".format(job_name)
+        self.msg["Subject"] = "Job: {} has terminated".format(self.insert_data["job_name"])
 
     def build_and_send_message(self):
         """Attaches all the body string to the message"""
+        self.add_message()
         body = MIMEText(self.body, 'plain')
         self.msg.attach(body)
 
