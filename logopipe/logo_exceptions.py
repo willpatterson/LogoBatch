@@ -22,4 +22,8 @@ class NoUniqueFileFoundError(Exception):
     def __init__(self, message):
         super(NoUniqueFileFoundError, self).__init__(message)
 
+class BatchTemplateFileNotFoundError(Exception):
+    """Error when no batchfile is found"""
+    def __init__(self, message):
+        super(BatchTemplateFileNotFoundError, self).__init__(message)
 

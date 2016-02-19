@@ -4,9 +4,10 @@ This file contains the batch classes
 
 import os
 import sys
+M
 sys.path.append("..")
 
-from logo_exceptions import NoUniqueFileFoundError, InvalidExecutableError
+from logo_exceptions import NoUniqueFileFoundError, InvalidExecutableError, BatchTemplateFileNotFoundError
 from email_notice import Email
 
 class Batch:
@@ -43,7 +44,7 @@ class Batch:
 
         self.executable = yaml_data['exe']
         if not (os.path.isfile(self.executable) and os.access(self.executable, os.X_OK)):
-            raise InvalidExecutableError("") #TODO add message
+            raise InvalidExecutableError("Error Executable {} is was not found. Aborting job".format(self.executable)) 
         #TODO add case for command in path
 
     def create_commands(self):
@@ -96,7 +97,8 @@ class Batch:
 
         self.commands.append(self.command_base.format(**inserts))
 
-    def generate_unique(self, unique_path):
+    @staticmethod
+    def generate_unique(unique_path):
         """Opens a file with unique entries and yields them"""
         #TODO Possibly make this use the class variable
 
@@ -110,9 +112,11 @@ class Batch:
         also populates the job_files list
         """
 
-        template = ""
-        with open("btemplate.sh", "r") as btemplate: #TODO implement different template options
+        template = self.read_btemplate()
+        """
+        with open("btemplate.sh", "r") as btemplate:
             template = btemplate.readlines()
+        """
 
         file_count = 0
         count = 0
@@ -169,11 +173,30 @@ class Batch:
                     try:
                         with open(job_file, 'a') as jfile:
                             for email_obj in email_objs:
-                                jfile.write(email_objs.generate_email_command() + '\n')
+                                jfile.write(email_obj.generate_email_command() + '\n')
                     except: #TODO fix
                         pass
 
             file_count += 1
+
+    def read_btemplate(self):
+        """Reads btemplate file from a variety of locations"""
+
+        template = ""
+        paths = [os.path.join(self.model_path, 'in', 'btemplate.sh'),
+                 os.path.join(os.getcwd(), 'btemplate.sh'),
+                 os.path.join(os.path.expanduser('~'), 'btemplate.sh')]
+        for path in paths:
+            try:
+                with open(path, "r") as btemplate:
+                    template = btemplate.readlines()
+                return template
+            except FileNotFoundError:
+                pass
+
+        raise BatchTemplateFileNotFoundError
+
+
 
     def schedule_batch(self):
         """Schedules the batches' job files in slurm"""
