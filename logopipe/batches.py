@@ -247,7 +247,7 @@ class ThreadTest(Batch):
 
         try:
             for unique_item in self.generate_unique(self.unique_path):
-                for _ in generate_cpu_range():
+                for _ in self.generate_cpu_range():
                     self.format_command(unique_item=unique_item)
         except: #TODO add exception
             for _ in self.generate_cpu_range():
