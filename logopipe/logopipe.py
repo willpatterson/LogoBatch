@@ -11,6 +11,7 @@ import os, sys
 sys.path.append("..")
 
 from batches import ThreadTest, Analysis
+from logo_exceptions import InvalidBatchTypeError, InvalidExecutableError
 
 class Run:
     """
