@@ -9,4 +9,4 @@ setup(name="logopipe",
       package_data={'logopipe': ['*.yml', '*.txt', '*.sh']},
       install_requires=["Pyyaml"],
       long_description="long_description",
-      entry_points={"console_scripts": ["logop=logopipe.logopipe:main",]})
+      entry_points={"console_scripts": ["logopipe=logopipe.logopipe:main",]})
