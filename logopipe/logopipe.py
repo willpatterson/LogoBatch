@@ -8,10 +8,10 @@ import datetime
 from collections import namedtuple
 
 import os, sys
-sys.path.append("..")
+sys.path.append(os.path.abspath(".."))
 
-from batches import ThreadTest, Analysis
-from logo_exceptions import InvalidBatchTypeError, InvalidExecutableError
+from logopipe.batches import ThreadTest, Analysis
+from logopipe.logo_exceptions import InvalidBatchTypeError, InvalidExecutableError
 
 class Run:
     """

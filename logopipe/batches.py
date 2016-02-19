@@ -4,11 +4,10 @@ This file contains the batch classes
 
 import os
 import sys
-M
 sys.path.append("..")
 
-from logo_exceptions import NoUniqueFileFoundError, InvalidExecutableError, BatchTemplateFileNotFoundError
-from email_notice import Email
+from logopipe.logo_exceptions import NoUniqueFileFoundError, InvalidExecutableError, BatchTemplateFileNotFoundError
+from logopipe.email_notice import Email
 
 class Batch:
     """Base class for analysis and threadtest"""
