@@ -192,8 +192,6 @@ class Batch:
 
         raise BatchTemplateFileNotFoundError
 
-
-
     def schedule_batch(self):
         """Schedules the batches' job files in slurm"""
 
