@@ -6,7 +6,7 @@ setup(name="logopipe",
       license="MIT",
       author="William Patterson",
       packages=find_packages(),
-      package_data={'logopipe': ['*.yml', '*.txt', '*.sh'],
+      package_data={'logopipe': ['*.yml', '*.txt', '*.sh']},
       install_requires=["Pyyaml"],
       long_description="long_description",
       entry_points={"console_scripts": ["logopipe=logopipe.logopipe:main",]})
