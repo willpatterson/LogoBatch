@@ -28,11 +28,20 @@
         upper: 16
 
 - analysis:
-    name: "Example"
-    enabled: true
+    name: "sleep_example"
+    enabled: false
     command: "{exe} {unique}"
     exe: "/bin/sleep"
-    unquie: "sleeptimes.txt"
+    unique: "sleeptimes.txt"
+
+- analysis:
+    name: "CapExps"
+    enabled: true
+    email: true
+    command: "{exe} --model {mod}/BUPwithMUASimple1.nlogo --experiment {unique} --table {out}/{unique} --threads {cpus}"
+    exe:     "/share/apps/user/stow/netlogo-5.2.1/netlogo-headless.sh"
+    cpus: 8
+    unique: "{in}/CapExps.csv"
 
 - email: 
     addresses: ["wpatt2"]
