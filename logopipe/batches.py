@@ -2,6 +2,12 @@
 This file contains the batch classes
 """
 
+import os
+import sys
+sys.path.append("..")
+
+from logo_exceptions import NoUniqueFileFoundError, InvalidExecutableError
+from email_notice import Email
 
 class Batch:
     """Base class for analysis and threadtest"""
@@ -169,13 +175,12 @@ class Batch:
 
             file_count += 1
 
-
-
     def schedule_batch(self):
         """Schedules the batches' job files in slurm"""
 
         for job_file in self.job_files:
             os.system("sbatch {job}".format(job=job_file))
+
 
 class Analysis(Batch):
     """ A Batch object with unique command parameters"""
