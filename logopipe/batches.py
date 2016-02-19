@@ -170,12 +170,8 @@ class Batch:
                                                 slurm_file,
                                                 job_out_path,
                                                 ntasks))
-                    try:
-                        with open(job_file, 'a') as jfile:
-                            for email_obj in email_objs:
-                                jfile.write(email_obj.generate_email_command() + '\n')
-                    except: #TODO fix
-                        pass
+                        for email_obj in email_objs:
+                            bfile.write(email_obj.generate_email_command() + '\n')
 
             file_count += 1
 
