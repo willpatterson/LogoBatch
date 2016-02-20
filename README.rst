@@ -16,32 +16,33 @@ Model Directory structure:
 ::
     model_directory
     |
-    |NetLogo input files
+    +NetLogo input files
     |
-    |in
-    |  |Analysis_directory
-    |  |  |netlogo_commands.csv
+    +in
     |  |
-    |  |Analysis_directory_2
+    |  +run.yml    #There can be multiple run.yml files.
+    |  +unique.csv #There can be multiple unique.csv files.
     |
-    |out
-    |   |Analysis_directory_out
-    |   |  |outfiles
-    |   |
-    |   |Analysis_directory_2_out
-    |   |  |outfiles
+    +out
+       |
+       +Run1
+       |  |    
+       |  +Analysis1
+       |  |  |
+       |  |  +Job1
+       |  |  |  |
+       |  |  |  +outfile(s).whatever 
+       |  |  |  +slurm.out
+       |  |  |  +jobfile.sh
+       |  |  |
+       |  |  +Job2 ...
+       |  |  
+       |  +Analysis2 ...  
+       |
+       +Run2 ...
+    
 
-The ``out`` directory is created by ``LogoPipe`` when you run your analysis. Output can be directed elsewhere if desired (see Input CSV Files).
+The ``out`` directory is created by ``LogoPipe`` when you run your analysis. Output can be directed elsewhere if desired using command line flags.
 
-Input CSV Files
----------------
-The input csv files must be located in ``model_dir/in/analysis_name/``. You can have mulitiple analysis directories inside the ``in`` directory and mulitple csv files in each analysis directory.
-
-Input CSV file format:
-======================
-
-Each row in an input csv file is a single command to be scheduled in slurm. The first collumn is the executable to call, and every following column is an argument for that executable. The commands are compiled left-to-right in the order outlined in the csv.
-
-Every input csv must have a header line indicating the flags, if any, for every argument value in it's corrisponding file. The first value in the csv header doesn't matter because the first collumn is assumed to be the executable being called. If an argument is positional and has no flag, leave the header for that collumn blank and put it in the correct order.
 
 
