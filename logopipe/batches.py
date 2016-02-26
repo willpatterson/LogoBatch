@@ -41,18 +41,14 @@ class Batch:
         else:
             self.out_path = os.path.join(out_path, self.name)
 
+        """ Should change this to a warning
         self.executable = yaml_data['exe']
         if not (os.path.isfile(self.executable) and os.access(self.executable, os.X_OK)):
             raise InvalidExecutableError("Error Executable {} is was not found. Aborting job".format(self.executable)) 
         #TODO add case for command in path
-
-    def create_commands(self):
-        """
-        Virtual method that, when implemented, will create the
-        commands for the batch
         """
 
-        raise NotImplementedError()
+
 
     def build_unique_path(self, unique):
         """
@@ -104,6 +100,48 @@ class Batch:
         with open(unique_path, "r") as uni:
             for line in uni:
                 yield line.split(",")[0].replace("\n", "")
+
+    # Virtual Methods vvvvvvvvvvvvvvvvvvv
+    def create_commands(self):
+        """
+        Virtual method that, when implemented, will create the
+        commands for the batch
+        """
+
+        raise NotImplementedError()
+
+    def launch_batch(self):
+        """
+        """
+
+        raise NotImplementedError()
+
+class SlurmBatch(Batch):
+    """ A Batch object with unique command parameters"""
+
+    def __init__(self, yaml_data, model_path, out_path=None):
+        """Init fucntion adds the sets the cpu number"""
+        #TODO Possibly implement a default cpu number here
+
+        super().__init__(yaml_data, model_path, out_path)
+        try:
+            self.cpus = yaml_data['cpus']
+        except KeyError:
+            self.cpus = 1
+
+    # BEGIN Implemented Virtual Methods vvvvvvvvvvvvvvvvvv
+    def create_commands(self):
+        """Creates and adds commands with the format_command method"""
+
+        for unique_item in self.generate_unique(self.unique_path):
+            self.format_command(unique_item=unique_item)
+
+    def launch_batch(self):
+        self.create_commands()
+        self.create_job_file("""...""")
+        self.schedule_batch()
+
+    # END Implemented Virtual Methods ^^^^^^^^^^^^^^^^^^
 
     def create_job_file(self, ntasks, email_info, run_name):
         """
@@ -198,24 +236,38 @@ class Batch:
             os.system("sbatch {job}".format(job=job_file))
 
 
-class Analysis(Batch):
-    """ A Batch object with unique command parameters"""
+class SshBatch(Batch):
+    """
 
-    def __init__(self, yaml_data, model_path, out_path=None):
-        """Init fucntion adds the sets the cpu number"""
-        #TODO Possibly implement a default cpu number here
+    """
 
+    def __init__(self, yaml_data, model_path, out_path):
         super().__init__(yaml_data, model_path, out_path)
+        
         try:
             self.cpus = yaml_data['cpus']
         except KeyError:
             self.cpus = 1
 
     def create_commands(self):
-        """Creates and adds commands with the format_command method"""
 
-        for unique_item in self.generate_unique(self.unique_path):
-            self.format_command(unique_item=unique_item)
+        tmp_commands = []
+        for unique_item in self.generate_unique():
+            tmp_commands.append(self.format_command(unique_item))
+
+        double_cmd = '({cmd1}; {cmd2};)&'
+        double_commands = []
+        for count, cmd in enumerate(commands):
+            try:
+                if (count % 2) == 0:
+                    new_cmd = double_cmd.format(cmd1=cmd, cmd2=commands[count+1])
+                    double_commands.append(new_cmd)
+            except IndexError:
+                double_commands.append("{cmd} &".format(cmd=cmd))
+
+
+
+     
 
 class ThreadTest(Batch):
     """

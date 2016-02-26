@@ -1,9 +1,9 @@
 import os
 
-command = "{exe} --model {mod}/BUPwithMUASimple1.nlogo --experiment {unique} --table /home/wpatt2/Alex_out/{unique} --threads 8 > {stdo}{unique}.output"
+command = "{exe} --model {mod}/BUPwithMUASimple1.nlogo --experiment {unique} --table /home/wpatt2/CapDoc_out/{unique} --threads 8 > {stdo}{unique}.output"
 exe = "/share/apps/user/stow/netlogo-5.2.1/netlogo-headless.sh"
 mod = "/home/wpatt2/allExp"
-stdout = "/home/wpatt2/Alex_out/stdout/"
+stdout = "/home/wpatt2/CapDoc_out/stdout/"
 
 commands = []
 with open("/home/wpatt2/allExp/CapExps.csv", 'r') as cfile:
