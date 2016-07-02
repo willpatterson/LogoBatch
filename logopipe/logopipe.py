@@ -107,8 +107,10 @@ class Run:
             add_flag = True
 
         if add_flag is True:
-            if batch.name == 'analysis':
-                batch = Analysis(batch.data, self.model_path, out_path=self.out_path)
+            if batch.name == 'slurm_batch':
+                batch = SlurmBatch(batch.data, self.model_path, out_path=self.out_path)
+            elif batch.name == 'ssh_batch':
+                batch = SshBatch(batch.data, self.model_path, out_path=self.out_path)
             elif batch.name == 'thread_test':
                 batch = ThreadTest(batch.data, self.model_path, out_path=self.out_path)
             else:
