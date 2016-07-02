@@ -53,6 +53,3 @@ Model Directory structure:
 
 The ``out`` directory is created when you run LogoPipe. Output can be 
 directed elsewhere if desired using command line flags.
-
-
-
