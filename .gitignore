@@ -6,4 +6,3 @@ __pycache__/
 ImageFudge.egg-info/
 build/
 dist/
-test/
