@@ -1,3 +1,5 @@
+.. image:: https://travis-ci.org/willpatterson/LogoPipe.svg?branch=master 
+    :target: https://travis-ci.org/willpatterson/LogoPipe
 ********
 LogoPipe
 ********
