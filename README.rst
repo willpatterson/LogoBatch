@@ -2,12 +2,15 @@
 LogoPipe
 ********
 
-``LogoPipe`` is a simple software pipeline that is designed to automate the process of running NetLogo analyses in the ``Slurm Scheduler`` and managing output. 
+``LogoPipe`` is a simple software pipeline designed to automate the process
+of running thousands of NetLogo models on a beowulf cluster using 
+``The Slurm Scheduler`` or ``SSH``.
 
 Model Directory
 ---------------
 
-LogoPipe takes a model directory as input that is searched for input CSV files containing command parameters.
+LogoPipe takes a model directory as input. The input directory is searched 
+for CSV files containing parameters to be passed to headless netlogo.
 
 Model Directory structure:
 ==========================
@@ -42,7 +45,8 @@ Model Directory structure:
        +Run2 ...
     
 
-The ``out`` directory is created by ``LogoPipe`` when you run your analysis. Output can be directed elsewhere if desired using command line flags.
+The ``out`` directory is created when you run LogoPipe. Output can be 
+directed elsewhere if desired using command line flags.
 
 
 
