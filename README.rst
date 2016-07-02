@@ -14,14 +14,14 @@ LogoPipe takes a model directory as input that is searched for input CSV files c
 Model Directory structure:
 ==========================
 
-.. raw::
+::
 
     model_directory
     |
     +NetLogo input files
     |
     +in
-    |  |
+    | |
     |  +run.yml    #There can be multiple run.yml files.
     |  +unique.csv #There can be multiple unique.csv files.
     |
