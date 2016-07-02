@@ -6,7 +6,9 @@ import os
 import sys
 sys.path.append("..")
 
-from logopipe.logo_exceptions import NoUniqueFileFoundError, InvalidExecutableError, BatchTemplateFileNotFoundError
+from logopipe.logo_exceptions import NoUniqueFileFoundError,
+                                     InvalidExecutableError,
+                                     BatchTemplateFileNotFoundError
 from logopipe.email_notice import Email
 
 class Batch:
@@ -40,15 +42,6 @@ class Batch:
             self.out_path = os.path.join(model_path, "out", self.name)
         else:
             self.out_path = os.path.join(out_path, self.name)
-
-        """ Should change this to a warning
-        self.executable = yaml_data['exe']
-        if not (os.path.isfile(self.executable) and os.access(self.executable, os.X_OK)):
-            raise InvalidExecutableError("Error Executable {} is was not found. Aborting job".format(self.executable)) 
-        #TODO add case for command in path
-        """
-
-
 
     def build_unique_path(self, unique):
         """
@@ -158,14 +151,16 @@ class SlurmBatch(Batch):
         file_count = 0
         count = 0
         while count < len(self.commands):
-            job_name = "{name}-job-{count}".format(name=self.name, count=file_count)
+            job_name = "{name}-job-{count}".format(name=self.name,
+                                                   count=file_count)
             job_out_path = os.path.join(self.out_path, job_name)
             print(job_out_path)
 
             slurm_file = "{job_name}-%j.out".format(job_name=job_name)
             slurm_file_path = os.path.join(job_out_path, slurm_file)
 
-            job_file_path = os.path.join(job_out_path, ".".join([job_name, "sh"]))
+            job_file_path = os.path.join(job_out_path,
+                                         ".".join([job_name, "sh"]))
             self.job_files.append(job_file_path)
 
             try:
@@ -174,16 +169,16 @@ class SlurmBatch(Batch):
                 pass
 
             with open(job_file_path, 'w') as bfile:
-                #Write Slurm settings to slurm batch file #############################
+                #Write Slurm settings to slurm batch file ####################
                 for line in template: #Write Template file
                     bfile.write(line) #
 
                 #Write automated parameters to file
-                bfile.write("#SBATCH -J {analysis}\n".format(analysis=self.name))
-                bfile.write("#SBATCH --cpus-per-task={cpus}\n".format(cpus=self.cpus))
-                bfile.write("#SBATCH -o {slurm_file}\n".format(slurm_file=slurm_file_path))
+                bfile.write("#SBATCH -J {}\n".format(self.name))
+                bfile.write("#SBATCH --cpus-per-task={}\n".format(self.cpus))
+                bfile.write("#SBATCH -o {}\n".format(slurm_file_path))
 
-                #Write commands#########################################################
+                #Write commands###############################################
                 try:
                     for _ in range(ntasks):
                         command = self.commands[count]
@@ -196,7 +191,7 @@ class SlurmBatch(Batch):
                 except IndexError:
                     pass
 
-                #Write email commands ####################################################
+                #Write email commands #######################################
                 if self.email is True:
                     email_objs = []
                     for email in email_info["addresses"]:
@@ -243,7 +238,7 @@ class SshBatch(Batch):
 
     def __init__(self, yaml_data, model_path, out_path):
         super().__init__(yaml_data, model_path, out_path)
-        
+
         try:
             self.cpus = yaml_data['cpus']
         except KeyError:
@@ -260,14 +255,11 @@ class SshBatch(Batch):
         for count, cmd in enumerate(commands):
             try:
                 if (count % 2) == 0:
-                    new_cmd = double_cmd.format(cmd1=cmd, cmd2=commands[count+1])
+                    new_cmd = double_cmd.format(cmd1=cmd,
+                                                cmd2=commands[count+1])
                     double_commands.append(new_cmd)
             except IndexError:
                 double_commands.append("{cmd} &".format(cmd=cmd))
-
-
-
-     
 
 class ThreadTest(Batch):
     """
@@ -277,7 +269,8 @@ class ThreadTest(Batch):
     This Batch obejct is intended to figure out where the point of
     deminishing returns related to the number of alloacted threads
 
-    Thread test objects can use also run thread test ranges with unique parameters
+    Thread test objects can use also run thread test ranges
+    with unique parameters
     """
 
     def __init__(self, yaml_data, model_path, out_path=None):
