@@ -1,0 +1,10 @@
+.env/
+*.swp
+.DS_Store
+__pycache__/
+
+ImageFudge.egg-info/
+build/
+dist/
+test/
+
