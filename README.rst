@@ -8,6 +8,10 @@ LogoPipe
 of running thousands of NetLogo models on a beowulf cluster using 
 ``The Slurm Scheduler`` or ``SSH``.
 
+**LogoPipe should be considered pre-release software.**
+LogoPipe is currently being refactored.
+
+
 Model Directory
 ---------------
 
