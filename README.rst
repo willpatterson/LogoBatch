@@ -13,7 +13,9 @@ LogoPipe takes a model directory as input that is searched for input CSV files c
 
 Model Directory structure:
 ==========================
+
 ::
+
     model_directory
     |
     +NetLogo input files
