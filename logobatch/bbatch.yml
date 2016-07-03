@@ -1,0 +1,42 @@
+#Batch Batch Example and Test File
+
+- Batch:
+    name: "sleep_example"
+    batch_type: "local"
+    enabled: false
+    email: true
+    command: "{exe} {unique}"
+    exe: "/bin/sleep"
+    unique: "sleeptimes.txt"
+
+- Batch:
+    name: "Example"
+    batch_type: "ssh"
+    enabled: true
+    email: false
+    batch_base: "test"
+    command: "(hostname; date; echo {u1} {u2}) > out)"
+    unique: "{in}/random_names.csv"
+ 
+- thread_test:
+    name: "Example TT"
+    enabled: false
+    email: false
+    command: ""
+    unique: ""
+    range: "1-5"
+
+- email: 
+    addresses: ["wpatt2"]
+   
+#OLD:
+- Batch:
+    name: "CapExps"
+    enabled: true
+    email: true
+    command: "{exe} --model {mod}/BUPwithMUASimple1.nlogo --experiment {unique} --table {out}/{unique} --threads {cpus}"
+    exe:     "/share/apps/user/stow/netlogo-5.2.1/netlogo-headless.sh"
+    cpus: 8
+    unique: "{in}/CapExps.csv"
+
+
