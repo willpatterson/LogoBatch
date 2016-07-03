@@ -23,8 +23,8 @@ class Batch(object):
     def __init__(self, **kwds):
         """ """
         self.name = kwds.get('name', str(datetime.now()).replace(' ', '-'))
-        self.model_path = kwds.get('model_path', self.raise_invalid_attribute(''))
-        self.output = kwds.get('model_path', os.path.join(self.model_path,
+        self.batch_root = kwds.get('batch_base', self.raise_invalid_attribute(''))
+        self.output = kwds.get('batch_base', os.path.join(self.batch_base,
                                                           self.name))
         self.command_base = kwds.get('command', self.raise_invalid_attribute(''))
         self.cpus = kwds.get('cpus', 1)
@@ -41,7 +41,7 @@ class Batch(object):
         batch_type = kwds.get('batch_type', 'local')
         for cls in Batch.__subclasses__():
             if batch_type in cls.batch_type:
-                return cls
+                return cls(**kwds)
         raise InvalidBatchTypeError
 
     @staticmethod
@@ -58,9 +58,9 @@ class Batch(object):
 
         inserts = {}
         if '{mod}' in unique:
-            inserts["mod"] = self.model_path
+            inserts["mod"] = self.batch_base
         if '{in}' in unique:
-            inserts["in"] = os.path.join(self.model_path, 'in')
+            inserts["in"] = os.path.join(self.batch_base, 'in')
         unique = unique.format(**inserts)
 
         if not os.path.isfile(unique):
@@ -80,10 +80,10 @@ class Batch(object):
         if '{out}' in self.command_base:
             inserts["out"] = '{out}'
         if '{mod}' in self.command_base:
-            inserts["mod"] = self.model_path
+            inserts["mod"] = self.batch_base
 
         if '{in}' in self.command_base:
-            inserts["in"] = os.path.join(self.model_path, 'in')
+            inserts["in"] = os.path.join(self.batch_base, 'in')
         if '{unique}' in self.command_base:
             inserts["unique"] = unique_item
 
@@ -213,7 +213,7 @@ class SlurmBatch(Batch):
         """Reads btemplate file from a variety of locations"""
 
         template = ""
-        paths = [os.path.join(self.model_path, 'in', 'btemplate.sh'),
+        paths = [os.path.join(self.batch_base, 'in', 'btemplate.sh'),
                  os.path.join(os.getcwd(), 'btemplate.sh'),
                  os.path.join(os.path.expanduser('~'), 'btemplate.sh')]
         for path in paths:
