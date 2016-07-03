@@ -232,9 +232,7 @@ class SlurmBatch(Batch):
 
 
 class SshBatch(Batch):
-    """
-
-    """
+    """ """
 
     def __init__(self, yaml_data, model_path, out_path):
         super().__init__(yaml_data, model_path, out_path)
@@ -244,22 +242,19 @@ class SshBatch(Batch):
         except KeyError:
             self.cpus = 1
 
-    def create_commands(self):
+    def create_commands(self, command_number):
+        """Creates command to be sent over ssh"""
 
-        tmp_commands = []
+        raw_commands = []
         for unique_item in self.generate_unique():
-            tmp_commands.append(self.format_command(unique_item))
+            raw_commands.append(self.format_command(unique_item))
 
-        double_cmd = '({cmd1}; {cmd2};)&'
-        double_commands = []
-        for count, cmd in enumerate(commands):
-            try:
-                if (count % 2) == 0:
-                    new_cmd = double_cmd.format(cmd1=cmd,
-                                                cmd2=commands[count+1])
-                    double_commands.append(new_cmd)
-            except IndexError:
-                double_commands.append("{cmd} &".format(cmd=cmd))
+        commands = []
+        for i in range(0, len(tmp_commands), command_number):
+            command_set = raw_commands[i:i+command_number]
+            commands.append('({})&'.format('; '.join(command_set)))
+
+        return compound_commands
 
 class ThreadTest(Batch):
     """
