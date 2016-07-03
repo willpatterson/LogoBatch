@@ -1,0 +1,10 @@
+Batches:
+  - name: "test_1"
+    batch_type: "local"
+    enabled: false
+    email: true
+    command: "(date; echo {i1}) > {out}/test_v{i}"
+    inputs: ["test", "test1"]
+
+Email:
+  addresses: ["wpatt2@pdx.edu"]
