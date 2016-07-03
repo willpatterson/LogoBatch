@@ -7,7 +7,7 @@
     email: true
     command: "{exe} {unique}"
     exe: "/bin/sleep"
-    inputs: "sleeptimes.txt"
+    inputs: [10, 10, 10, 20, 30]
 
 - Batch:
     name: "Example"
@@ -15,7 +15,7 @@
     enabled: true
     email: false
     batch_base: "test"
-    command: "(hostname; date; echo {i1} {i2}) > out)"
+    command: "(hostname; date; echo {i1} {i2}) > {out}/hostdate_v{n}.out)"
     inputs: "{in}/random_names.csv"
  
 - thread_test:
@@ -35,9 +35,7 @@
     enabled: true
     email: true
     command: "{exe} --model {mod}/BUPwithMUASimple1.nlogo --experiment {unique} --table {out}/{unique} --threads {cpus}"
-    exe:     "/share/apps/user/stow/netlogo-5.2.1/netlogo-headless.sh"
+    exe: "/share/apps/user/stow/netlogo-5.2.1/netlogo-headless.sh"
     cpus: 8
     unique: "{in}/CapExps.csv"
 
-
-"
