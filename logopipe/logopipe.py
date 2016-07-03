@@ -13,11 +13,11 @@ sys.path.append(os.path.abspath(".."))
 from logopipe.batches import ThreadTest, Analysis
 from logopipe.logo_exceptions import InvalidBatchTypeError, InvalidExecutableError
 
-class Run:
+class LogoPipe:
     """
-    The run class contains and manages all Batch objects
+    The LogoPipe class contains and manages all Batch objects
 
-    The Run class is responsible for:
+    LogoPipe is responsible for:
        - parsing yaml files
        - creating Batch objects from yaml data
        - setting the base output path
@@ -31,7 +31,7 @@ class Run:
                  ntasks=1,
                  out_path=None,
                  yaml_path=None):
-        """Initalizes all class variables for run"""
+        """Initalizes all attributes LogoPipe"""
 
         self.name = name
         self.model_path = model_path
@@ -187,16 +187,16 @@ def get_args():
 
 def main():
     args = get_args()
-    run = Run(args.run_name,
-              args.model_path,
-              ntasks=args.ntasks,
-              yaml_path=args.yaml_path,
-              out_path=args.output_path)
+    pipe = LogoPipe(args.run_name,
+                    args.model_path,
+                    ntasks=args.ntasks,
+                    yaml_path=args.yaml_path,
+                    out_path=args.output_path)
 
-    run.create_batches()
-    run.create_commands()
-    run.create_slurm_jobs()
-    run.schedule_batches()
+    pipe.create_batches()
+    pipe.create_commands()
+    pipe.create_slurm_jobs()
+    pipe.schedule_batches()
 
 if __name__ == "__main__":
     main()
