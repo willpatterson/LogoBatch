@@ -13,11 +13,11 @@ sys.path.append(os.path.abspath(".."))
 from logopipe.batches import ThreadTest, Analysis
 from logopipe.logo_exceptions import InvalidBatchTypeError, InvalidExecutableError
 
-class LogoPipe:
+class BatchManager:
     """
-    The LogoPipe class contains and manages all Batch objects
+    The BatchManager class contains and manages all Batch objects
 
-    LogoPipe is responsible for:
+    BatchManager is responsible for:
        - parsing yaml files
        - creating Batch objects from yaml data
        - setting the base output path
@@ -31,7 +31,7 @@ class LogoPipe:
                  ntasks=1,
                  out_path=None,
                  yaml_path=None):
-        """Initalizes all attributes LogoPipe"""
+        """Initalizes all attributes """
 
         self.name = name
         self.model_path = model_path
@@ -73,7 +73,7 @@ class LogoPipe:
         ydata = []
         for y_obj in raw_ydata:
             try:
-                if not (len(y_obj.keys()) > 1):
+                if len(y_obj.keys()) == 1:
                     for key in y_obj.keys():
                         name = key
                     ydata.append(YmlObj(name=name, data=y_obj[name]))
@@ -187,16 +187,16 @@ def get_args():
 
 def main():
     args = get_args()
-    pipe = LogoPipe(args.run_name,
-                    args.model_path,
-                    ntasks=args.ntasks,
-                    yaml_path=args.yaml_path,
-                    out_path=args.output_path)
+    bm = BatchManager(args.run_name,
+                      args.model_path,
+                      ntasks=args.ntasks,
+                      yaml_path=args.yaml_path,
+                      out_path=args.output_path)
 
-    pipe.create_batches()
-    pipe.create_commands()
-    pipe.create_slurm_jobs()
-    pipe.schedule_batches()
+    bm.create_batches()
+    bm.create_commands()
+    bm.create_slurm_jobs()
+    bm.schedule_batches()
 
 if __name__ == "__main__":
     main()
