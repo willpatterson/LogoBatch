@@ -2,9 +2,9 @@
 LogoBatch
 *********
 
-``LogoBatch`` is a simple software pipeline originally designed to automate the process
-of running thousands of NetLogo models on a beowulf cluster using 
-``Slurm`` or ``SSH``.
+``LogoBatch`` is a simple that distributes shell commands  on a beowulf
+cluster using ``Slurm`` or ``SSH``. LogoBatch originally designed to 
+automate the process of running thousands of NetLogo models 
 
 **LogoBatch should be considered pre-release software.**
 LogoBatch is currently being refactored.
