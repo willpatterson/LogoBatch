@@ -1,5 +1,3 @@
-.. image:: https://travis-ci.org/willpatterson/LogoBatch.svg?branch=master 
-    :target: https://travis-ci.org/willpatterson/LogoBatch
 *********
 LogoBatch
 *********
