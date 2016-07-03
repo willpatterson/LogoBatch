@@ -7,11 +7,11 @@ import os
 import sys
 sys.path.append("..")
 
-from logopipe.logo_exceptions import NoUniqueFileFoundError,
+from logobatch.logo_exceptions import NoUniqueFileFoundError,
                                      InvalidExecutableError,
                                      BatchTemplateFileNotFoundError,
                                      InvalidBatchTypeError
-from logopipe.email_notice import Email
+from logobatch.email_notice import Email
 
 class Batch(object):
     """

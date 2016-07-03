@@ -16,11 +16,11 @@ clean:
 
 dev-clean:
 	$(CLEAN)
-	-rm -rf ImageFudge.egg-info
+	-rm -rf logobatch.egg-info
 
 install-clean:
 	$(CLEAN)
-	-rm -rf ImageFudge.egg-info
+	-rm -rf logobatch.egg-info
 	-rm -rf build
 	-rm -rf dist
 	-rm -rf .env

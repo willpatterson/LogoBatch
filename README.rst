@@ -1,21 +1,21 @@
-.. image:: https://travis-ci.org/willpatterson/LogoPipe.svg?branch=master 
-    :target: https://travis-ci.org/willpatterson/LogoPipe
-********
-LogoPipe
-********
+.. image:: https://travis-ci.org/willpatterson/LogoBatch.svg?branch=master 
+    :target: https://travis-ci.org/willpatterson/LogoBatch
+*********
+LogoBatch
+*********
 
-``LogoPipe`` is a simple software pipeline originally designed to automate the process
+``LogoBatch`` is a simple software pipeline originally designed to automate the process
 of running thousands of NetLogo models on a beowulf cluster using 
 ``Slurm`` or ``SSH``.
 
-**LogoPipe should be considered pre-release software.**
-LogoPipe is currently being refactored.
+**LogoBatch should be considered pre-release software.**
+LogoBatch is currently being refactored.
 
 
 Model Directory
 ---------------
 
-LogoPipe takes a model directory as input. The input directory is searched 
+LogoBatch takes a model directory as input. The input directory is searched 
 for CSV files containing parameters to be passed to headless netlogo.
 
 Model Directory structure:
@@ -51,5 +51,5 @@ Model Directory structure:
        +Run2 ...
     
 
-The ``out`` directory is created when you run LogoPipe. Output can be 
+The ``out`` directory is created when you run LogoBatch. Output can be 
 directed elsewhere if desired using command line flags.

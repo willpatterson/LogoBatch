@@ -36,7 +36,7 @@ class Email:
         self.msg.attach(body)
 
         server = smtplib.SMTP('localhost')
-        sender = "LogoPipe-{host}".format(socket.gethostname())
+        sender = "logobatch-{host}".format(socket.gethostname())
         server.sendmail(sender, self.msg["To"], self.msg.as_string())
         #server.sendmail("Do-Not-Reply", "wpatt2@pdx.edu", self.msg.as_string())
 
