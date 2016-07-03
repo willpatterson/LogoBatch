@@ -7,7 +7,7 @@ import os
 import sys
 sys.path.append("..")
 
-from logobatch.logo_exceptions import NoUniqueFileFoundError,
+from logobatch.logo_exceptions import NoinputsFileFoundError,
                                      InvalidExecutableError,
                                      BatchTemplateFileNotFoundError,
                                      InvalidBatchTypeError
@@ -28,12 +28,12 @@ class Batch(object):
                                                           self.name))
         self.command_base = kwds.get('command', self.raise_invalid_attribute(''))
         self.cpus = kwds.get('cpus', 1)
-        self.unique = kwds.get('unique', None)
+        self.inputs = kwds.get('inputs', None)
         self.email = kwds.get('email', False)
 
-        if '{unique}' in self.command_base and self.unique is None:
-            raise NoUniqueFileFoundError(("No 'unique' file was specifed in your"
-                                          " yaml object but {unique} was found"
+        if '{inputs}' in self.command_base and self.inputs is None:
+            raise NoinputsFileFoundError(("No 'inputs' file was specifed in your"
+                                          " yaml object but {inputs} was found"
                                           " in your command"))
 
     def __new__(cls, **kwds):
@@ -50,25 +50,25 @@ class Batch(object):
         raise Exception(message) #TODO add real exception
 
 
-    def build_unique_path(self, unique):
+    def build_inputs_path(self, inputs):
         """
-        Builds a path for the unique file
-        Throws an error if unique path isn't valid
+        Builds a path for the inputs file
+        Throws an error if inputs path isn't valid
         """
 
         inserts = {}
-        if '{mod}' in unique:
+        if '{mod}' in inputs:
             inserts["mod"] = self.batch_base
-        if '{in}' in unique:
+        if '{in}' in inputs:
             inserts["in"] = os.path.join(self.batch_base, 'in')
-        unique = unique.format(**inserts)
+        inputs = inputs.format(**inserts)
 
-        if not os.path.isfile(unique):
-            raise NoUniqueFileFoundError("message goes here") #TODO add message
+        if not os.path.isfile(inputs):
+            raise NoinputsFileFoundError("message goes here") #TODO add message
 
-        return unique
+        return inputs
 
-    def format_command(self, unique_item=None):
+    def format_command(self, inputs_item=None):
         """
         Formats a command from the base command with class variables
         and adds them the the batches' command list
@@ -84,8 +84,8 @@ class Batch(object):
 
         if '{in}' in self.command_base:
             inserts["in"] = os.path.join(self.batch_base, 'in')
-        if '{unique}' in self.command_base:
-            inserts["unique"] = unique_item
+        if '{inputs}' in self.command_base:
+            inserts["inputs"] = inputs_item
 
         if '{cpus}' in self.command_base:
             inserts["cpus"] = self.cpus
@@ -93,11 +93,11 @@ class Batch(object):
         self.commands.append(self.command_base.format(**inserts))
 
     @staticmethod
-    def generate_unique(unique_path):
-        """Opens a file with unique entries and yields them"""
+    def generate_inputs(inputs_path):
+        """Opens a file with inputs entries and yields them"""
         #TODO Possibly make this use the class variable
 
-        with open(unique_path, "r") as uni:
+        with open(inputs_path, "r") as uni:
             for line in uni:
                 yield line.split(",")[0].replace("\n", "")
 
@@ -117,7 +117,7 @@ class Batch(object):
         raise NotImplementedError()
 
 class SlurmBatch(Batch):
-    """ A Batch object with unique command parameters"""
+    """ A Batch object with inputs command parameters"""
 
     batch_type = ['slurm']
     def __init__(self, **kwds):
@@ -128,8 +128,8 @@ class SlurmBatch(Batch):
     def create_commands(self):
         """Creates and adds commands with the format_command method"""
 
-        for unique_item in self.generate_unique(self.unique_path):
-            self.format_command(unique_item=unique_item)
+        for inputs_item in self.generate_inputs(self.inputs_path):
+            self.format_command(inputs_item=inputs_item)
 
     def launch_batch(self):
         self.create_commands()
@@ -244,8 +244,8 @@ class SshBatch(Batch):
         """Creates command to be sent over ssh"""
 
         raw_commands = []
-        for unique_item in self.generate_unique():
-            raw_commands.append(self.format_command(unique_item))
+        for inputs_item in self.generate_inputs():
+            raw_commands.append(self.format_command(inputs_item))
 
         commands = []
         for i in range(0, len(tmp_commands), command_number):
@@ -267,7 +267,7 @@ class ThreadTest(Batch):
     deminishing returns related to the number of alloacted threads
 
     Thread test objects can use also run thread test ranges
-    with unique parameters
+    with inputs parameters
     """
 
     batch_type = ['threadtest']
@@ -286,9 +286,9 @@ class ThreadTest(Batch):
         """Creats and adds commands to the batch"""
 
         try:
-            for unique_item in self.generate_unique(self.unique_path):
+            for inputs_item in self.generate_inputs(self.inputs_path):
                 for _ in self.generate_cpu_range():
-                    self.format_command(unique_item=unique_item)
+                    self.format_command(inputs_item=inputs_item)
         except Exception as err: #TODO add exception
             for _ in self.generate_cpu_range():
                 self.format_command()
