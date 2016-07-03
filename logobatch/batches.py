@@ -120,15 +120,9 @@ class SlurmBatch(Batch):
     """ A Batch object with unique command parameters"""
 
     batch_type = ['slurm']
-    def __init__(self, yaml_data, model_path, out_path=None):
+    def __init__(self, **kwds):
         """Init fucntion adds the sets the cpu number"""
-        #TODO Possibly implement a default cpu number here
-
-        super().__init__(yaml_data, model_path, out_path)
-        try:
-            self.cpus = yaml_data['cpus']
-        except KeyError:
-            self.cpus = 1
+        super().__init__(**kwds)
 
     # BEGIN Implemented Virtual Methods vvvvvvvvvvvvvvvvvv
     def create_commands(self):
@@ -232,7 +226,7 @@ class SlurmBatch(Batch):
 
         raise BatchTemplateFileNotFoundError
 
-    def launch_batch(self):
+    def schedule_batch(self):
         """Schedules the batches' job files in slurm"""
 
         for job_file in self.job_files:
@@ -243,13 +237,8 @@ class SshBatch(Batch):
     """ """
 
     batch_type = ['ssh']
-    def __init__(self, yaml_data, model_path, out_path):
-        super().__init__(yaml_data, model_path, out_path)
-
-        try:
-            self.cpus = yaml_data['cpus']
-        except KeyError:
-            self.cpus = 1
+    def __init__(self, **kwds):
+        super().__init__(**kwds)
 
     def create_commands(self, command_number):
         """Creates command to be sent over ssh"""
@@ -282,16 +271,16 @@ class ThreadTest(Batch):
     """
 
     batch_type = ['threadtest']
-    def __init__(self, yaml_data, model_path, out_path=None):
+    def __init__(self, **kwds):
         """
         Sets the self.upper class var
         sets the self.cpus class var as lower. This is done to allow
         ThreadTest batches to use the format_command method
         """
 
-        super().__init__(yaml_data, model_path, out_path)
-        self.upper = yaml_data['upper']
-        self.cpus = yaml_data['lower']
+        super().__init__(**kwds)
+        self.upper = kwds.get('upper', raise_invalid_attribute("")
+        self.cpus = kwds.get('lower', 1)
 
     def create_commands(self):
         """Creats and adds commands to the batch"""
