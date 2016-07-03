@@ -4,9 +4,9 @@
 LogoPipe
 ********
 
-``LogoPipe`` is a simple software pipeline designed to automate the process
+``LogoPipe`` is a simple software pipeline originally designed to automate the process
 of running thousands of NetLogo models on a beowulf cluster using 
-``The Slurm Scheduler`` or ``SSH``.
+``Slurm`` or ``SSH``.
 
 **LogoPipe should be considered pre-release software.**
 LogoPipe is currently being refactored.
