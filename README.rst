@@ -3,7 +3,7 @@ LogoBatch
 *********
 
 ``LogoBatch`` is a simple that distributes shell commands  on a beowulf
-cluster using ``Slurm`` or ``SSH``. LogoBatch originally designed to 
+cluster using ``Slurm`` or ``SSH``. LogoBatch was originally designed to 
 automate the process of running thousands of NetLogo models. 
 
 **LogoBatch should be considered pre-release software.**
