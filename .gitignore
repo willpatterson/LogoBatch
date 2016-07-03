@@ -3,6 +3,6 @@
 .DS_Store
 __pycache__/
 
-ImageFudge.egg-info/
+logopipe.egg-info/
 build/
 dist/
