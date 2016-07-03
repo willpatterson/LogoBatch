@@ -2,46 +2,53 @@
 This file contains the batch classes
 """
 
+from datetime import datetime
 import os
 import sys
 sys.path.append("..")
 
 from logopipe.logo_exceptions import NoUniqueFileFoundError,
                                      InvalidExecutableError,
-                                     BatchTemplateFileNotFoundError
+                                     BatchTemplateFileNotFoundError,
+                                     InvalidBatchTypeError
 from logopipe.email_notice import Email
 
-class Batch:
-    """Base class for analysis and threadtest"""
+class Batch(object):
+    """
+    Base class for analysis and threadtest
+    TODO:
+        get rid of yaml_data!!! Get it its vairables into class attributes
+    """
 
-    def __init__(self, yaml_data, model_path, out_path=None):
-        """Init method attempts to build output and unquie paths"""
+    def __init__(self, **kwds):
+        """ """
+        self.name = kwds.get('name', str(datetime.now()).replace(' ', '-'))
+        self.model_path = kwds.get('model_path', self.raise_invalid_attribute(''))
+        self.output = kwds.get('model_path', os.path.join(self.model_path,
+                                                          self.name))
+        self.command_base = kwds.get('command', self.raise_invalid_attribute(''))
+        self.cpus = kwds.get('cpus', 1)
+        self.unique = kwds.get('unique', None)
+        self.email = kwds.get('email', False)
 
-        self.commands = []
-        self.job_files = []
+        if '{unique}' in self.command_base and self.unique is None:
+            raise NoUniqueFileFoundError(("No 'unique' file was specifed in your"
+                                          " yaml object but {unique} was found"
+                                          " in your command"))
 
-        self.name = yaml_data['name']
-        self.command_base = yaml_data['command']
-        self.model_path = model_path
-        self.cpus = 1
+    def __new__(cls, **kwds):
+        """Creates and returns proper batch type"""
+        batch_type = kwds.get('batch_type', 'local')
+        for cls in Batch.__subclasses__():
+            if batch_type in cls.batch_type:
+                return cls
+        raise InvalidBatchTypeError
 
-        if '{unique}' in self.command_base:
-            try:
-                self.unique_path = self.build_unique_path(yaml_data['unique'])
-            except KeyError:
-                raise NoUniqueFileFoundError("No 'unique' file was specifed in your yaml object but {unique} was found in your command")
-        else:
-            self.unique_path = None
+    @staticmethod
+    def raise_invalid_attribute(message):
+        """Raises error for invalid attribute settings"""
+        raise Exception(message) #TODO add real exception
 
-        try:
-            self.email = yaml_data["email"]
-        except KeyError:
-            self.email = False
-
-        if out_path is None:
-            self.out_path = os.path.join(model_path, "out", self.name)
-        else:
-            self.out_path = os.path.join(out_path, self.name)
 
     def build_unique_path(self, unique):
         """
@@ -112,6 +119,7 @@ class Batch:
 class SlurmBatch(Batch):
     """ A Batch object with unique command parameters"""
 
+    batch_type = ['slurm']
     def __init__(self, yaml_data, model_path, out_path=None):
         """Init fucntion adds the sets the cpu number"""
         #TODO Possibly implement a default cpu number here
@@ -224,7 +232,7 @@ class SlurmBatch(Batch):
 
         raise BatchTemplateFileNotFoundError
 
-    def schedule_batch(self):
+    def launch_batch(self):
         """Schedules the batches' job files in slurm"""
 
         for job_file in self.job_files:
@@ -234,6 +242,7 @@ class SlurmBatch(Batch):
 class SshBatch(Batch):
     """ """
 
+    batch_type = ['ssh']
     def __init__(self, yaml_data, model_path, out_path):
         super().__init__(yaml_data, model_path, out_path)
 
@@ -256,6 +265,10 @@ class SshBatch(Batch):
 
         return compound_commands
 
+    def launch_batch(self):
+        """Schedules the batch job files over SSH"""
+        pass
+
 class ThreadTest(Batch):
     """
     A batch object that is used to run identical commands with
@@ -268,6 +281,7 @@ class ThreadTest(Batch):
     with unique parameters
     """
 
+    batch_type = ['threadtest']
     def __init__(self, yaml_data, model_path, out_path=None):
         """
         Sets the self.upper class var
@@ -297,5 +311,3 @@ class ThreadTest(Batch):
         for ncpu in range(self.cpus, self.upper):
             self.cpus = ncpu
             yield
-
-
