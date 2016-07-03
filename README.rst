@@ -4,24 +4,24 @@ LogoBatch
 
 ``LogoBatch`` is a simple that distributes shell commands  on a beowulf
 cluster using ``Slurm`` or ``SSH``. LogoBatch originally designed to 
-automate the process of running thousands of NetLogo models 
+automate the process of running thousands of NetLogo models. 
 
 **LogoBatch should be considered pre-release software.**
 LogoBatch is currently being refactored.
 
 
-Model Directory
+Batch Directory
 ---------------
 
-LogoBatch takes a model directory as input. The input directory is searched 
-for CSV files containing parameters to be passed to headless netlogo.
+LogoBatch takes a batch directory as input. `batch_directory/in` is searched 
+for CSV files containing parameters to be passed to set shell commands.
 
-Model Directory structure:
+Batch Directory structure:
 ==========================
 
 ::
 
-    model_directory
+    batch
     |
     +NetLogo input files
     |
