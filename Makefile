@@ -1,4 +1,12 @@
-.PHONY: clean travis-test
+.PHONY: init dev-clean install-clean clean travis-test
+
+init:
+	-mkdir .env
+	virtualenv .env
+	pip install --upgrade pip
+	pip install --upgrade setuptools
+	python setup.py develop
+
 
 travis-test:
 	python -m unittest discover
