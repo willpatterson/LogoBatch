@@ -2,12 +2,13 @@
 This file contains the batch classes
 """
 
-from datetime import datetime
 import os
 import sys
+import re
+
+from datetime import datetime
+
 sys.path.append("..")
-
-
 from logobatch.email_notice import Email
 
 class NoSlurmTemplateError(Exception):
@@ -90,6 +91,7 @@ class Batch(object):
             raise NoInputsFileFoundError("message goes here") #TODO add message
 
         return inputs
+
 
     def format_command(self, inputs_item=None):
         """
