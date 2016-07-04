@@ -1,6 +1,6 @@
 import unittest
 
-from logobatch.batches import Batch, SshBatch, SlurmBatch
+from logobatch.batches import Batch, SshBatch, SlurmBatch, LocalBatch
 from logobatch.logobatch import BatchManager
 
 BATCH_BASE = "test/test_batch_base"
@@ -25,4 +25,34 @@ class TestBatchManager(unittest.TestCase):
         assert(isinstance(batches[0].inputs, list))
         assert(isinstance(addresses, list))
         assert(addresses[0] == 'wpatt2@pdx.edu')
+
+class TestBatch(unittest.TestCase):
+    """Test Class for Batch"""
+
+    """
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+    """
+
+    def test__new__factory(self):
+        ssh_params = {'batch_type': 'ssh', 'command': 'test'}
+        slurm_params = {'batch_type': 'slurm', 'command': 'test'}
+        local_params = {'batch_type': 'local', 'command': 'test'}
+        typeless_params = {'command': 'test'}
+        assert(isinstance(Batch(**ssh_params), SshBatch))
+        assert(isinstance(Batch(**slurm_params), SlurmBatch))
+        assert(isinstance(Batch(**local_params), LocalBatch))
+        assert(isinstance(Batch(**typeless_params), LocalBatch))
+
+if __name__ == '__main__':
+    test_classes = (TestBatch, TestBatchManager)
+    test_suite = unittest.TestSuite()
+    for test_class in test_classes:
+        test_suite.addTest(test_class())
+
+    runner = unittest.TextTestRunner()
+    runner.run(test_suite)
 

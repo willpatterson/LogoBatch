@@ -326,3 +326,12 @@ class ThreadTest(Batch):
         for ncpu in range(self.cpus, self.upper):
             self.cpus = ncpu
             yield
+
+class LocalBatch(Batch):
+    """ """
+    type_names = ['local']
+    def __init__(self, **kwds):
+        super().__init__(**kwds)
+
+    def launch_batch(self):
+        raise NotImplementedError
