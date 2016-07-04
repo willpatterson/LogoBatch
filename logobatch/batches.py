@@ -40,7 +40,7 @@ class Batch(object):
         """Creates and returns proper batch type"""
         batch_type = kwds.get('batch_type', 'local')
         for cls in Batch.__subclasses__():
-            if batch_type in cls.batch_type:
+            if batch_type in cls.type_names:
                 return cls(**kwds)
         raise InvalidBatchTypeError
 
@@ -119,7 +119,7 @@ class Batch(object):
 class SlurmBatch(Batch):
     """ A Batch object with inputs command parameters"""
 
-    batch_type = ['slurm']
+    type_names = ['slurm']
     def __init__(self, **kwds):
         """Init fucntion adds the sets the cpu number"""
         super().__init__(**kwds)
@@ -239,7 +239,7 @@ class SlurmBatch(Batch):
 class SshBatch(Batch):
     """ """
 
-    batch_type = ['ssh']
+    type_names = ['ssh']
     def __init__(self, **kwds):
         super().__init__(**kwds)
 
@@ -273,7 +273,7 @@ class ThreadTest(Batch):
     with inputs parameters
     """
 
-    batch_type = ['threadtest']
+    type_names = ['threadtest']
     def __init__(self, **kwds):
         """
         Sets the self.upper class var
