@@ -27,9 +27,13 @@ class TestBatch(unittest.TestCase):
     """Test Class for Batch"""
 
     def test__new__factory(self):
-        ssh_params = {'batch_type': 'ssh', 'command': 'test'}
-        slurm_params = {'batch_type': 'slurm', 'command': 'test'}
-        local_params = {'batch_type': 'local', 'command': 'test'}
+        ssh_params = {'batch_type': 'ssh',
+                      'hostnames': ['test.local'],
+                      'command': 'test'}
+        slurm_params = {'batch_type': 'slurm',
+                        'command': 'test'}
+        local_params = {'batch_type': 'local',
+                        'command': 'test'}
         typeless_params = {'command': 'test'}
         assert(isinstance(Batch(**ssh_params), SshBatch))
         assert(isinstance(Batch(**slurm_params), SlurmBatch))
