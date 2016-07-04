@@ -27,3 +27,7 @@ class BatchTemplateFileNotFoundError(Exception):
     def __init__(self, message):
         super(BatchTemplateFileNotFoundError, self).__init__(message)
 
+class NoBatchesError(Exception):
+    """Error when no batches are found in a bbatch file"""
+    def __init__(self, message):
+        super(NoBatchesError, self).__init__(message)
