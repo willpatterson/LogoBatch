@@ -23,3 +23,6 @@ class TestBatchManager(unittest.TestCase):
         assert(isinstance(batches[1], SlurmBatch))
         assert(batches[0].name)
         assert(isinstance(batches[0].inputs, list))
+        assert(isinstance(addresses, list))
+        assert(addresses[0] == 'wpatt2@pdx.edu')
+
