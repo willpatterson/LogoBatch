@@ -52,7 +52,6 @@ class BatchManager:
         with open(bbatch, 'r') as yfile:
             ydata = yaml.load(yfile)
 
-        print(ydata["Batches"])
         batches = ydata.get('Batches', None)
         if not isinstance(batches, list): raise BBatchFormatError("") #TODO add message
         batches = [Batch(**batch) for batch in batches if batch.get('enabled',
