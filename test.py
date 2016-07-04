@@ -12,9 +12,6 @@ class TestBatchManager(unittest.TestCase):
     def setUp(self):
         self.bm = BatchManager(BBATCH, BATCH_BASE)
 
-    def tearDown(self):
-        pass
-
     def test_parse_bbatch(self):
         """tests parse_bbatch method"""
         batches, addresses = self.bm.parse_bbatch(BBATCH)
@@ -29,14 +26,6 @@ class TestBatchManager(unittest.TestCase):
 class TestBatch(unittest.TestCase):
     """Test Class for Batch"""
 
-    """
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
-    """
-
     def test__new__factory(self):
         ssh_params = {'batch_type': 'ssh', 'command': 'test'}
         slurm_params = {'batch_type': 'slurm', 'command': 'test'}
@@ -46,6 +35,22 @@ class TestBatch(unittest.TestCase):
         assert(isinstance(Batch(**slurm_params), SlurmBatch))
         assert(isinstance(Batch(**local_params), LocalBatch))
         assert(isinstance(Batch(**typeless_params), LocalBatch))
+
+    """
+    def test_format_command(self):
+    """
+
+class TestSshBatch(unittest.TestCase):
+    """ """
+    def setUp(self):
+        bm = BatchManager(BBATCH, BATCH_BASE)
+        self.ssh_batch = bm.batches[0]
+
+class TestSlurmBatch(unittest.TestCase):
+    """ """
+    def setUp(self):
+        bm = BatchManager(BBATCH, BATCH_BASE)
+        self.slurm_batch = bm.batches[1]
 
 if __name__ == '__main__':
     test_classes = (TestBatch, TestBatchManager)
