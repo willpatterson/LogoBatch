@@ -49,8 +49,8 @@ class Batch(object):
         """ """
         self.command_base = kwds.get('command', None) #Required
         if self.command_base is None: raise MissingAttributeError("Missing command")
-        self.executable = kwds.get('executable', '')
 
+        self.executable = kwds.get('executable', '')
         self.batch_base = kwds.get('batch_base', '.')
         self.name = kwds.get('name', str(datetime.now()).replace(' ', '-'))
         #TODO add check and warning if data will be overwritten
@@ -143,7 +143,7 @@ class Batch(object):
 class SlurmBatch(Batch):
     """ A Batch object with inputs command parameters"""
 
-    type_names = ['slurm']
+    type_names = {'slurm'}
     def __init__(self, **kwds):
         """Init fucntion adds the sets the cpu number"""
         super().__init__(**kwds)
@@ -263,7 +263,7 @@ class SlurmBatch(Batch):
 class SshBatch(Batch):
     """ """
 
-    type_names = ['ssh']
+    type_names = {'ssh'}
     def __init__(self, **kwds):
         super().__init__(**kwds)
 
@@ -297,7 +297,7 @@ class ThreadTest(Batch):
     with inputs parameters
     """
 
-    type_names = ['threadtest']
+    type_names = {'threadtest'}
     def __init__(self, **kwds):
         """
         Sets the self.upper class var
@@ -330,7 +330,7 @@ class ThreadTest(Batch):
 
 class LocalBatch(Batch):
     """ """
-    type_names = ['local']
+    type_names = {'local'}
     def __init__(self, **kwds):
         super().__init__(**kwds)
 
