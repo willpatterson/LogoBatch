@@ -43,7 +43,16 @@ class Batch(object):
         get rid of yaml_data!!! Get it its vairables into class attributes
     """
 
-    type_names = []
+    type_names = {}
+
+    def __new__(cls, **kwds):
+        """Creates and returns proper batch type"""
+        batch_type = kwds.get('batch_type', 'local')
+        if batch_type in cls.type_names: return super(Batch, cls).__new__(cls, **kwds)
+        for sub_cls in cls.__subclasses__():
+            if batch_type in sub_cls.type_names:
+                return super(Batch, cls).__new__(sub_cls)
+        raise InvalidBatchTypeError("bad batch type: {}".format(batch_type)) #TDDO: Add message
 
     def __init__(self, **kwds):
         """ """
@@ -59,20 +68,10 @@ class Batch(object):
         self.email = kwds.get('email', False)
         self.cpus = kwds.get('cpus', 1)
 
-        if '{inputs}' in self.command_base and self.inputs is None:
+        if re.match(r'\{i[0-9]+\}', self.command_base) and self.inputs is None:
             raise NoinputsFileFoundError(("No 'inputs' file was specifed in your"
                                           " yaml object but {inputs} was found"
                                           " in your command"))
-
-    def __new__(cls, **kwds):
-        """Creates and returns proper batch type"""
-        batch_type = kwds.get('batch_type', 'local')
-        if batch_type in cls.type_names: return super(Batch, cls).__new__(cls, **kwds)
-        for sub_cls in cls.__subclasses__():
-            if batch_type in sub_cls.type_names:
-                return super(Batch, cls).__new__(sub_cls)
-        raise InvalidBatchTypeError("bad batch type: {}".format(batch_type)) #TDDO: Add message
-
 
     def build_inputs_path(self, inputs):
         """
