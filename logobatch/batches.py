@@ -285,8 +285,11 @@ class SshBatch(Batch):
         elif self.hostnames is None: raise NoHostNameError("") #TODO Message
         elif not isinstance(self.hostnames, list): raise TypeError()
 
-    def create_commands(self, command_number):
+    def create_commands(self, command_number=None):
         """Creates command to be sent over ssh"""
+        if command_number is None:
+            try: command_number = self.command_number
+            except AttributeError: command_number = 1
 
         raw_commands = []
         for inputs_item in self.generate_inputs():
