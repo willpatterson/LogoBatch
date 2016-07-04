@@ -1,6 +1,7 @@
 Batches:
   - name: "sshb"
     batch_type: "ssh"
+    hostnames: ['test.local']
     enabled: true
     email: true
     command: "(date; echo {i1}) > {out}/test_v{i}"
