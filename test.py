@@ -18,7 +18,7 @@ class TestBatchManager(unittest.TestCase):
         assert(isinstance(batches, list))
         assert(isinstance(batches[0], SshBatch))
         assert(isinstance(batches[1], SlurmBatch))
-        assert(batches[0].name)
+        assert(batches[0].name == 'sshb')
         assert(isinstance(batches[0].inputs, list))
         assert(isinstance(addresses, list))
         assert(addresses[0] == 'wpatt2@pdx.edu')
