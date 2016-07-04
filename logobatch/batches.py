@@ -24,7 +24,7 @@ class Batch(object):
         """ """
         self.name = kwds.get('name', str(datetime.now()).replace(' ', '-'))
         self.batch_root = kwds.get('batch_base', self.raise_invalid_attribute(''))
-        self.output = kwds.get('batch_base', os.path.join(self.batch_base,
+        self.output = kwds.get('batch_base', os.path.join(self.batch_base, #TODO add check and warning if data will be overwritten
                                                           self.name))
         self.command_base = kwds.get('command', self.raise_invalid_attribute(''))
         self.cpus = kwds.get('cpus', 1)
@@ -142,6 +142,9 @@ class SlurmBatch(Batch):
         """
         Creates job files from the batches' command list
         also populates the job_files list
+
+        TODO:
+            REFACTOR!
         """
 
         template = self.read_btemplate()
