@@ -100,6 +100,10 @@ class Batch(object):
         """
 
         inserts = {}
+        inputs = set(re.findall(r'\{i[0-9]*\}', self.command_base))
+        other = set(re.findall(r'\{.+\}', self.command_base)) - inputs
+        #TODO left off here.
+
         if '{exe}' in self.command_base:
             inserts["exe"] = self.executable
         if '{out}' in self.command_base:
