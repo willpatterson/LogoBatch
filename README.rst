@@ -1,3 +1,6 @@
+.. image:: https://travis-ci.org/willpatterson/ImageFudge.svg?branch=master
+    :target: https://travis-ci.org/willpatterson/ImageFudge
+
 *********
 LogoBatch
 *********
