@@ -10,8 +10,8 @@ from collections import namedtuple
 import os, sys
 sys.path.append(os.path.abspath(".."))
 
-from logopipe.batches import ThreadTest, Analysis
-from logopipe.logo_exceptions import InvalidBatchTypeError, InvalidExecutableError
+from logobatch.batches import Batch
+from logobatch.logo_exceptions import InvalidBatchTypeError, InvalidExecutableError, NoBatchesError
 
 class BatchManager:
     """
@@ -25,113 +25,29 @@ class BatchManager:
        - running Batch objects
     """
 
-    def __init__(self,
-                 name,
-                 model_path,
-                 ntasks=1,
-                 out_path=None,
-                 yaml_path=None):
+    def __init__(self, bbatch, outpath=None):
         """Initalizes all attributes """
 
-        self.name = name
-        self.model_path = model_path
-        self.ntasks = ntasks
+        self.batches, self.addresses = self.parse_bbatch(bbatch)
 
-        if out_path is None:
-            self.out_path = os.path.join(self.model_path, 'out', self.name)
-        else:
-            self.out_path = os.path.join(out_path, self.name)
+    @staticmethod
+    def parse_bbatch(bbatch):
+        """ reads bbatch yaml file into batches """
 
-        if yaml_path is None:
-            self.yaml_paths = self._get_yaml_files()
-        else:
-            self.yaml_paths = [yaml_path]
-
-        self.batches = []
-        self.email_info = {}
-
-    #vvvvvvvvvvvvvvv Yaml file input Parsing vvvvvvvvvvvvvvvvvvvvvvvvvv
-    def create_batches(self):
-        """Reads all yaml files into the Batch objects"""
-
-        for yaml_path in self.yaml_paths:
-            #TODO catch incorrect yml format error here
-            self.read_yaml_file(yaml_path)
-
-    def read_yaml_file(self, yaml_path):
-        """
-        Reads a single yaml file into the Run object
-         - Opens yaml file
-         - catches errors when creating a batch object
-        """
+        BBatchData = namedtuple('BBatchData', ['batches', 'addresses'])
+        def raise_no_batch_error():
+            message = "Error: No batches were found in {}".format(path)
+            raise NoBatchesError(message)
 
         with open(yaml_path, 'r') as yfile:
-            raw_ydata = yaml.load(yfile)
+            ydata = yaml.load(yfile)
 
-        #Converts yaml nested dictionaries into namedtuples
-        YmlObj = namedtuple('YmlObj', ['name', 'data'])
-        ydata = []
-        for y_obj in raw_ydata:
-            try:
-                if len(y_obj.keys()) == 1:
-                    for key in y_obj.keys():
-                        name = key
-                    ydata.append(YmlObj(name=name, data=y_obj[name]))
-                else:
-                    print("Error: Invalid object format.. to many object names. Skipping")
-            except AttributeError:
-                print("Error: Invalid object format.. object not a dictionary. Sikpping")
+        batches = [Batch(batch) for batch in ydata.get("Batches",
+                                                       raise_no_batch_error())]
+        addresses = ydata.get('Email', None).get('addresses', None)
 
-        #TODO catch incorrect yml format error here
-        for y_obj in ydata:
-            try:
-                if y_obj.name == "email":
-                    self.email_info = y_obj.data
-                else:
-                    self.add_batch(y_obj)
+        return BBatchData(batches, addresses)
 
-            except InvalidBatchTypeError:
-                print("Error: Object type {otype} is invalid. Object ignored".format(otype=y_obj.name))
-            except InvalidExecutableError:
-                print("Error: Executable {exe} is invalid. Batch {bn} ignored".format(exe=y_obj.data["exe"],
-                                                                                      bn=y_obj.data["name"]))
-
-    def add_batch(self, batch):
-        """
-        Creates and the correct Batch object and adds it to the batch list
-        throws errors caught by read_yaml_file if format is not correct
-        """
-        try:
-            add_flag = batch.data["enabled"]
-        except KeyError:
-            add_flag = True
-
-        if add_flag is True:
-            if batch.name == 'slurm_batch':
-                batch = SlurmBatch(batch.data, self.model_path, out_path=self.out_path)
-            elif batch.name == 'ssh_batch':
-                batch = SshBatch(batch.data, self.model_path, out_path=self.out_path)
-            elif batch.name == 'thread_test':
-                batch = ThreadTest(batch.data, self.model_path, out_path=self.out_path)
-            else:
-                raise InvalidBatchTypeError("Batch type {btype} is invalid".format(btype=batch.name))
-
-            self.batches.append(batch)
-        else:
-            print("Ignoring: {name}".format(name=batch.name))
-
-    def _get_yaml_files(self):
-        """Gets all yaml files from a directory"""
-
-        in_path = os.path.join(self.model_path, "in")
-        in_files = os.listdir(in_path)
-        in_files = [os.path.join(in_path, infile) for infile in in_files]
-
-        return [infile for infile in in_files if infile.endswith(".yml")]
-
-    #^^^^^^^^^^^^^^^^^^ Yaml file input Parsing ^^^^^^^^^^^^^^^^^^^^^^^^^
-
-    #vvvvvvvvvvvvvvvvvvvvvvvvvv PipeLining vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
     def create_commands(self):
         """Triggers batch objects to create their commands"""
