@@ -259,13 +259,26 @@ class SlurmBatch(Batch):
         for job_file in self.job_files:
             os.system("sbatch {job}".format(job=job_file))
 
+class NoHostNameError(Exception):
+    """Error for when no hostnames are passed into SshBatch"""
+    def __init__(self, message):
+        super(NoHostNameError, self).__init__(message)
 
 class SshBatch(Batch):
-    """ """
+    """
+    TODO:
+        Possibly add a ~/.logobatch file which is read for
+            hostnames if not specified in bbfile.yml
+    """
 
     type_names = {'ssh'}
     def __init__(self, **kwds):
         super().__init__(**kwds)
+        self.command_number = kwds.get('command_number', 1)
+        self.hostnames = kwds.get('hostnames', None) #Required
+        if isinstance(self.hostnames, str): self.hostnames = [self.hostnames]
+        elif self.hostnames is None: raise NoHostNameError("") #TODO Message
+        elif not isinstance(self.hostnames, list): raise TypeError()
 
     def create_commands(self, command_number):
         """Creates command to be sent over ssh"""
@@ -282,8 +295,8 @@ class SshBatch(Batch):
         return compound_commands
 
     def launch_batch(self):
-        """Schedules the batch job files over SSH"""
-        pass
+        """Launches batch over SSH"""
+        compound_commands = self.create_commands(self.command_number)
 
 class ThreadTest(Batch):
     """
