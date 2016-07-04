@@ -7,12 +7,34 @@ import os
 import sys
 sys.path.append("..")
 
-from logobatch.batch_exceptions import InvalidExecutableError
-from logobatch.batch_exceptions import NoinputsFileFoundError
-from logobatch.batch_exceptions import BatchTemplateFileNotFoundError
-from logobatch.batch_exceptions import InvalidBatchTypeError
 
 from logobatch.email_notice import Email
+
+class NoSlurmTemplateError(Exception):
+    """Error when no batchfile is found"""
+    def __init__(self, message):
+        super(NoSlurmTemplateError, self).__init__(message)
+
+class InvalidExecutableError(Exception):
+    """Error thrown when executable doesn't exist"""
+    def __init__(self, message):
+        super(InvalidExecutableError, self).__init__(message)
+
+class NoInputsError(Exception):
+    """Error when no input sources are found"""
+    def __init__(self, message):
+        super(NoInputsError, self).__init__(message)
+
+class InvalidBatchTypeError(Exception):
+    """Error thrown when batch type isn't supported"""
+    def __init__(self, message):
+        super(InvalidBatchTypeError, self).__init__(message)
+
+class MissingAttributeError(Exception):
+    """Error thrown when batch type isn't supported"""
+    def __init__(self, message):
+        super(MissingAttributeError, self).__init__(message)
+
 
 class Batch(object):
     """
@@ -21,17 +43,17 @@ class Batch(object):
         get rid of yaml_data!!! Get it its vairables into class attributes
     """
 
+    type_names = []
+
     def __init__(self, **kwds):
         """ """
-        def raise_invalid_attribute(message):
-            """Raises error for invalid attribute settings"""
-            raise Exception(message) #TODO add real exception
+        self.command_base = kwds.get('command', None) #Required
+        if self.command_base is None: raise MissingAttributeError("Missing command")
 
+        self.batch_base = kwds.get('batch_base', '.')
         self.name = kwds.get('name', str(datetime.now()).replace(' ', '-'))
-        self.batch_base = kwds.get('batch_base', raise_invalid_attribute(''))
         #TODO add check and warning if data will be overwritten
         self.output = kwds.get('batch_base', os.path.join(self.batch_base, self.name))
-        self.command_base = kwds.get('command', raise_invalid_attribute(''))
         self.inputs = kwds.get('inputs', None)
         self.email = kwds.get('email', False)
         self.cpus = kwds.get('cpus', 1)
@@ -44,10 +66,11 @@ class Batch(object):
     def __new__(cls, **kwds):
         """Creates and returns proper batch type"""
         batch_type = kwds.get('batch_type', 'local')
-        for cls in Batch.__subclasses__():
-            if batch_type in cls.type_names:
-                return cls(**kwds)
-        raise InvalidBatchTypeError
+        if batch_type in cls.type_names: return super(Batch, cls).__new__(cls, **kwds)
+        for sub_cls in cls.__subclasses__():
+            if batch_type in sub_cls.type_names:
+                return super(Batch, cls).__new__(sub_cls)
+        raise InvalidBatchTypeError("bad batch type: {}".format(batch_type)) #TDDO: Add message
 
 
     def build_inputs_path(self, inputs):
@@ -64,7 +87,7 @@ class Batch(object):
         inputs = inputs.format(**inserts)
 
         if not os.path.isfile(inputs):
-            raise NoinputsFileFoundError("message goes here") #TODO add message
+            raise NoInputsFileFoundError("message goes here") #TODO add message
 
         return inputs
 

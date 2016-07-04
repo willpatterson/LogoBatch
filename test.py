@@ -1,6 +1,6 @@
 import unittest
 
-from logobatch.batches import Batch, SshBatch
+from logobatch.batches import Batch, SshBatch, SlurmBatch
 from logobatch.logobatch import BatchManager
 
 BATCH_BASE = "test/test_batch_base"
@@ -22,6 +22,4 @@ class TestBatchManager(unittest.TestCase):
         assert(isinstance(batches[0], SshBatch))
         assert(isinstance(batches[1], SlurmBatch))
         assert(batches[0].name)
-        assert(batches[0].batch_type == 'ssh')
-        assert(batches[0].enabled is False)
         assert(isinstance(batches[0].inputs, list))

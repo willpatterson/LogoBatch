@@ -11,7 +11,17 @@ import os, sys
 sys.path.append(os.path.abspath(".."))
 
 from logobatch.batches import Batch
-from logobatch.logo_exceptions import InvalidBatchTypeError, InvalidExecutableError, NoBatchesError
+
+class NoBatchesError(Exception):
+    """Error when no batches are found in a bbatch file"""
+    def __init__(self, message):
+        super(NoBatchesError, self).__init__(message)
+
+class BBatchFormatError(Exception):
+    """Error thrown when yaml format is incorrect"""
+    def __init__(self, message):
+        super(BBatchFormatError, self).__init__(message)
+
 
 class BatchManager:
     """
@@ -36,14 +46,17 @@ class BatchManager:
 
         BBatchData = namedtuple('BBatchData', ['batches', 'addresses'])
         def raise_no_batch_error():
-            message = "Error: No batches were found in {}".format(path)
+            message = "Error: No batches were found in {}".format(bbatch)
             raise NoBatchesError(message)
 
-        with open(yaml_path, 'r') as yfile:
+        with open(bbatch, 'r') as yfile:
             ydata = yaml.load(yfile)
 
-        batches = [Batch(batch) for batch in ydata.get("Batches",
-                                                       raise_no_batch_error())]
+        print(ydata["Batches"])
+        batches = ydata.get('Batches', None)
+        if not isinstance(batches, list): raise BBatchFormatError("") #TODO add message
+        batches = [Batch(**batch) for batch in batches if batch.get('enabled',
+                                                                    False)]
         addresses = ydata.get('Email', None).get('addresses', None)
 
         return BBatchData(batches, addresses)

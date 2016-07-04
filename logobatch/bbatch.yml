@@ -1,6 +1,6 @@
 #Batch Batch Example and Test File
 
-Batch:
+Batches:
   - name: "sleep_example"
     batch_type: "local"
     enabled: false
@@ -10,7 +10,7 @@ Batch:
     inputs: [10, 10, 10, 20, 30]
 
   - name: "Example"
-    batch_type: "ssh"
+    batch_type: ssh
     enabled: true
     email: false
     batch_base: "test"

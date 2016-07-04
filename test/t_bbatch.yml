@@ -1,14 +1,14 @@
 Batches:
   - name: "sshb"
     batch_type: "ssh"
-    enabled: false
+    enabled: true
     email: true
     command: "(date; echo {i1}) > {out}/test_v{i}"
     inputs: ["test", "test1"]
 
   - name: "slurmb"
     batch_type: "slurm"
-    enabled: false
+    enabled: true
     email: true
     command: "(date; echo {i1}) > {out}/test_v{i}"
     inputs: ["test", "test1"]
