@@ -23,14 +23,18 @@ class Batch(object):
 
     def __init__(self, **kwds):
         """ """
+        def raise_invalid_attribute(message):
+            """Raises error for invalid attribute settings"""
+            raise Exception(message) #TODO add real exception
+
         self.name = kwds.get('name', str(datetime.now()).replace(' ', '-'))
-        self.batch_root = kwds.get('batch_base', self.raise_invalid_attribute(''))
-        self.output = kwds.get('batch_base', os.path.join(self.batch_base, #TODO add check and warning if data will be overwritten
-                                                          self.name))
-        self.command_base = kwds.get('command', self.raise_invalid_attribute(''))
-        self.cpus = kwds.get('cpus', 1)
+        self.batch_base = kwds.get('batch_base', raise_invalid_attribute(''))
+        #TODO add check and warning if data will be overwritten
+        self.output = kwds.get('batch_base', os.path.join(self.batch_base, self.name))
+        self.command_base = kwds.get('command', raise_invalid_attribute(''))
         self.inputs = kwds.get('inputs', None)
         self.email = kwds.get('email', False)
+        self.cpus = kwds.get('cpus', 1)
 
         if '{inputs}' in self.command_base and self.inputs is None:
             raise NoinputsFileFoundError(("No 'inputs' file was specifed in your"
@@ -44,11 +48,6 @@ class Batch(object):
             if batch_type in cls.type_names:
                 return cls(**kwds)
         raise InvalidBatchTypeError
-
-    @staticmethod
-    def raise_invalid_attribute(message):
-        """Raises error for invalid attribute settings"""
-        raise Exception(message) #TODO add real exception
 
 
     def build_inputs_path(self, inputs):
@@ -283,7 +282,7 @@ class ThreadTest(Batch):
         """
 
         super().__init__(**kwds)
-        self.upper = kwds.get('upper', raise_invalid_attribute("")
+        self.upper = kwds.get('upper', raise_invalid_attribute(""))
         self.cpus = kwds.get('lower', 1)
 
     def create_commands(self):
