@@ -7,10 +7,11 @@ import os
 import sys
 sys.path.append("..")
 
-from logobatch.logo_exceptions import NoinputsFileFoundError,
-                                     InvalidExecutableError,
-                                     BatchTemplateFileNotFoundError,
-                                     InvalidBatchTypeError
+from logobatch.batch_exceptions import InvalidExecutableError
+from logobatch.batch_exceptions import NoinputsFileFoundError
+from logobatch.batch_exceptions import BatchTemplateFileNotFoundError
+from logobatch.batch_exceptions import InvalidBatchTypeError
+
 from logobatch.email_notice import Email
 
 class Batch(object):
