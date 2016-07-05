@@ -102,7 +102,10 @@ class Batch(object):
         inserts = {}
         inputs = set(re.findall(r'\{i[0-9]*\}', self.command_base))
         other = set(re.findall(r'\{.+\}', self.command_base)) - inputs
-        #TODO left off here.
+
+        for sub in other:
+            format_var = self.__dict__.get(sub, '')
+            inserts.update({sub: format_var})
 
         if '{exe}' in self.command_base:
             inserts["exe"] = self.executable
@@ -122,13 +125,26 @@ class Batch(object):
         self.commands.append(self.command_base.format(**inserts))
 
     @staticmethod
-    def generate_inputs(inputs_path):
+    def generate_inputs(path):
         """Opens a file with inputs entries and yields them"""
-        #TODO Possibly make this use the class variable
+        #If file csv yeild split lines
+        if os.path.isfile(path) and path.endswith('.csv'):
+            with open(path, 'r') as uni:
+                for line in uni:
+                    yield set(line.strip('\n ,\t').split(','))
 
-        with open(inputs_path, "r") as uni:
-            for line in uni:
-                yield line.split(",")[0].replace("\n", "")
+        #If file but not csv yield path to file
+        elif os.path.isfile(path):
+            yield os.path.realpath(path)
+
+        #If path dir yield all file paths in dir
+        elif os.path.isdir(path):
+            for fi in os.listdir(path):
+                fipath = os.path.join(os.path.realpath(path), fi)
+                if os.path.isfile(fipath):
+                    yield fipath
+
+
 
     # Virtual Methods vvvvvvvvvvvvvvvvvvv
     def create_commands(self):

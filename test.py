@@ -1,4 +1,5 @@
 import unittest
+import os
 
 from logobatch.batches import Batch, SshBatch, SlurmBatch, LocalBatch
 from logobatch.logobatch import BatchManager
@@ -40,6 +41,24 @@ class TestBatch(unittest.TestCase):
         assert(isinstance(Batch(**local_params), LocalBatch))
         assert(isinstance(Batch(**typeless_params), LocalBatch))
 
+    def test_generate_inputs(self):
+        """tests three outcomes of the generate inputs static method"""
+
+        test_csv = 'test/input_test.csv'
+        split_csv = [x for x in Batch.generate_inputs(test_csv)]
+        print(split_csv)
+        assert(split_csv == [{'1','2','3','4'},{'a','b','c','df'}])
+
+        test_file = 'test/t_bbatch.yml'
+        file_path = [x for x in Batch.generate_inputs(test_file)]
+        assert(file_path == [os.path.realpath(test_file)])
+
+        test_dir = 'test/input_dir_test'
+        dir_list = [x for x in Batch.generate_inputs(test_dir)]
+        print(dir_list)
+        assert(dir_list == [os.path.realpath(os.path.join(test_dir, 't1')),
+                            os.path.realpath(os.path.join(test_dir, 't2')),
+                            os.path.realpath(os.path.join(test_dir, 't3'))])
     """
     def test_format_command(self):
     """
