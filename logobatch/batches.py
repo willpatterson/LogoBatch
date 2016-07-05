@@ -70,7 +70,7 @@ class Batch(object):
         self.cpus = kwds.get('cpus', 1)
 
         if re.match(r'\{i[0-9]+\}', self.command_base) and self.inputs is None:
-            raise NoinputsFileFoundError(("No 'inputs' file was specifed in your"
+            raise NoInputsFileFoundError(("No 'inputs' file was specifed in your"
                                           " yaml object but {inputs} was found"
                                           " in your command"))
 
@@ -93,34 +93,26 @@ class Batch(object):
         return inputs
 
 
-    def format_command(self, inputs_item=None):
+    def format_command(self, command_id, inputs=None):
         """
         Formats a command from the base command with class variables
         and adds them the the batches' command list
         """
 
         inserts = {}
-        inputs = set(re.findall(r'\{i[0-9]*\}', self.command_base))
-        other = set(re.findall(r'\{.+\}', self.command_base)) - inputs
+        input_markers = set(re.findall(r'\{i[0-9]*\}', self.command_base))
+
+        if input_markers and not inputs:
+            raise Exception("") #TODO
+        if inputs and not input_markers:
+            print('Warning: You are passing input but no input markers found')
+
+        standard_markers = set(re.findall(r'\{.+\}', self.command_base))
+        standard_markers = standard_markers - input_markers
 
         for sub in other:
             format_var = self.__dict__.get(sub, '')
             inserts.update({sub: format_var})
-
-        if '{exe}' in self.command_base:
-            inserts["exe"] = self.executable
-        if '{out}' in self.command_base:
-            inserts["out"] = '{out}'
-        if '{mod}' in self.command_base:
-            inserts["mod"] = self.batch_base
-
-        if '{in}' in self.command_base:
-            inserts["in"] = os.path.join(self.batch_base, 'in')
-        if '{inputs}' in self.command_base:
-            inserts["inputs"] = inputs_item
-
-        if '{cpus}' in self.command_base:
-            inserts["cpus"] = self.cpus
 
         self.commands.append(self.command_base.format(**inserts))
 
