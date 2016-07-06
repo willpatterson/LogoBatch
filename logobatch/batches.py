@@ -83,8 +83,8 @@ class Batch(object):
 
         if re.match(r'\{i[0-9]+\}', self.command_base) and self.inputs is None:
             raise NoInputsFileFoundError(("No 'inputs' was specifed in your"
-                                          " yaml object but {inputs} was "
-                                          "found in your command"))
+                                          " yaml object but input markers"
+                                          " were found in your command"))
 
     def build_inputs_path(self, inputs):
         """
@@ -110,7 +110,7 @@ class Batch(object):
         Formats a command from the base command with class variables
         and adds them the the batches' command list
         TODO:
-            Support input markers
+            support warnings library
         """
 
         inserts = {}

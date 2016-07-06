@@ -73,7 +73,7 @@ class TestBatch(unittest.TestCase):
         """
         Tests format_command
         TODO tests:
-            execeptions and warnings
+            warning
         """
 
         #Test class attribute input markers
