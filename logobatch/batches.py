@@ -49,31 +49,34 @@ class Batch(object):
     def __new__(cls, **kwds):
         """Creates and returns proper batch type"""
         batch_type = kwds.get('batch_type', 'local')
-        if batch_type in cls.type_names: return super(Batch, cls).__new__(cls, **kwds)
+        if batch_type in cls.type_names:
+            return super(Batch, cls).__new__(cls, **kwds)
         for sub_cls in cls.__subclasses__():
             if batch_type in sub_cls.type_names:
                 return super(Batch, cls).__new__(sub_cls)
-        raise InvalidBatchTypeError("bad batch type: {}".format(batch_type)) #TDDO: Add message
+        raise InvalidBatchTypeError("bad batch type: {}".format(batch_type))
 
     def __init__(self, **kwds):
         """ """
         self.command_base = kwds.get('command', None) #Required
-        if self.command_base is None: raise MissingAttributeError("Missing command")
+        if self.command_base is None:
+            raise MissingAttributeError("Missing command")
 
         self.executable = kwds.get('executable', '')
         self.batch_base = kwds.get('batch_base', '.')
         self.name = kwds.get('name', str(datetime.now()).replace(' ', '-'))
         #TODO add check and warning if data will be overwritten
-        self.output = kwds.get('batch_base', os.path.join(self.batch_base, self.name))
+        self.output = kwds.get('batch_base',
+                               os.path.join(self.batch_base, self.name))
         self.inputs = kwds.get('inputs', None)
         self.email = kwds.get('email', False)
         self.cpus = kwds.get('cpus', 1)
         self.commands = []
 
         if re.match(r'\{i[0-9]+\}', self.command_base) and self.inputs is None:
-            raise NoInputsFileFoundError(("No 'inputs' file was specifed in your"
-                                          " yaml object but {inputs} was found"
-                                          " in your command"))
+            raise NoInputsFileFoundError(("No 'inputs' was specifed in your"
+                                          " yaml object but {inputs} was "
+                                          "found in your command"))
 
     def build_inputs_path(self, inputs):
         """
@@ -110,7 +113,7 @@ class Batch(object):
                 try:
                     inserts.update({marker: inputs[int(marker.strip('i'))]})
                 except IndexError as ie:
-                    if ignore_index is False: raise ie #TODO maybe custom message
+                    if ignore_index is False: raise ie #TODO maybe message
                     else:
                         print(('Warning: index {} is out of bownds. '
                                'Inputing empty stirng.').format(marker),
