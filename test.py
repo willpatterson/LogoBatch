@@ -92,6 +92,9 @@ class TestBatch(unittest.TestCase):
                                                                   inputs=('a')))
 
         #Test input markers and no inputs
+        sshb.command_base = '{i0} {i1} {i2} {i3}'
+        self.assertRaises(Exception, lambda: sshb.format_command(1))
+
         #Test input and not input markers
 
 class TestSshBatch(unittest.TestCase):
