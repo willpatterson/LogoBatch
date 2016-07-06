@@ -42,11 +42,14 @@ class TestBatch(unittest.TestCase):
         local_params = {'batch_type': 'local',
                         'command': 'test'}
         typeless_params = {'command': 'test'}
+
+        #Test batch type creation
         assert(isinstance(Batch(**ssh_params), SshBatch))
         assert(isinstance(Batch(**slurm_params), SlurmBatch))
         assert(isinstance(Batch(**local_params), LocalBatch))
         assert(isinstance(Batch(**typeless_params), LocalBatch))
 
+        #Test incorrect batch type error
         bad_type_params = {'batch_type': 'bad',
                            'command': 'test'}
         self.assertRaises(InvalidBatchTypeError,
@@ -69,6 +72,7 @@ class TestBatch(unittest.TestCase):
                             os.path.realpath(os.path.join(TEST_DIR, 't2')),
                             os.path.realpath(os.path.join(TEST_DIR, 't3'))])
 
+        #Test bad input
         self.assertRaises(InputsError,
                           lambda: list(Batch.generate_inputs('asdf')))
 
