@@ -89,7 +89,10 @@ class TestBatch(unittest.TestCase):
         #Test CSV index exception
         sshb.command_base = '{i10}'
         self.assertRaises(IndexError, lambda: sshb.format_command(1,
-                                                                  inputs=('')))
+                                                                  inputs=('a')))
+
+        #Test input markers and no inputs
+        #Test input and not input markers
 
 class TestSshBatch(unittest.TestCase):
     """ """
