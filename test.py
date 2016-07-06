@@ -27,6 +27,7 @@ class TestBatchManager(unittest.TestCase):
 TEST_CSV = 'test/input_test.csv'
 TEST_SINGLE_FILE = 'test/t_bbatch.yml'
 TEST_DIR = 'test/input_dir_test'
+INPUTS = ('0', '1', '2', '3')
 
 class TestBatch(unittest.TestCase):
     """Test Class for Batch"""
@@ -79,23 +80,25 @@ class TestBatch(unittest.TestCase):
 
         #Test CSV input markers
         sshb.command_base = '{id} {i0} {i1} {i2} {i3}'
-        command = sshb.format_command(1, inputs=('0','1','2','3'))
+        command = sshb.format_command(1, inputs=INPUTS)
         assert(command == '1 0 1 2 3')
 
         sshb.command_base = '{batch_base} {id} {i0} {i1} {i2} {i3}'
-        command = sshb.format_command(1, inputs=('0','1','2','3'))
+        command = sshb.format_command(1, inputs=INPUTS)
         assert(command == '{} 1 0 1 2 3'.format(sshb.batch_base))
 
         #Test CSV index exception
         sshb.command_base = '{i10}'
-        self.assertRaises(IndexError, lambda: sshb.format_command(1,
-                                                                  inputs=('a')))
+        self.assertRaises(IndexError, lambda: sshb.format_command(1, inputs=INPUTS))
 
         #Test input markers and no inputs
         sshb.command_base = '{i0} {i1} {i2} {i3}'
         self.assertRaises(Exception, lambda: sshb.format_command(1))
 
         #Test input and not input markers
+        sshb.command_base = '{batch_base}'
+        self.assertRaises(Exception, lambda: sshb.format_command(1, inputs=INPUTS))
+
 
 class TestSshBatch(unittest.TestCase):
     """ """
