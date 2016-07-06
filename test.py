@@ -55,7 +55,7 @@ class TestBatch(unittest.TestCase):
 
         #Single file path yield
         file_path = [x for x in Batch.generate_inputs(TEST_SINGLE_FILE)]
-        assert(file_path == [os.path.realpath(test_file)])
+        assert(file_path == [os.path.realpath(TEST_SINGLE_FILE)])
 
         #Direcotry file yield
         dir_list = [x for x in Batch.generate_inputs(TEST_DIR)]
@@ -80,7 +80,6 @@ class TestBatch(unittest.TestCase):
         sshb = Batch(**class_attr_params)
         command = sshb.format_command(1)
         assert(command == '{} {}'.format(sshb.batch_base, sshb.name))
-
 
 class TestSshBatch(unittest.TestCase):
     """ """
