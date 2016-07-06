@@ -65,9 +65,13 @@ class TestBatch(unittest.TestCase):
 
         #Direcotry file yield
         dir_list = [x for x in Batch.generate_inputs(TEST_DIR)]
+        dir_list = list(Batch.generate_inputs(TEST_DIR))
         assert(dir_list == [os.path.realpath(os.path.join(TEST_DIR, 't1')),
                             os.path.realpath(os.path.join(TEST_DIR, 't2')),
                             os.path.realpath(os.path.join(TEST_DIR, 't3'))])
+
+        self.assertRaises(InputsError,
+                          lambda: list(Batch.generate_inputs('asdf')))
 
     def test_format_command(self):
         """

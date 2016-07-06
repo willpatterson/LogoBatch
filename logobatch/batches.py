@@ -146,6 +146,9 @@ class Batch(object):
                 if os.path.isfile(fipath):
                     yield fipath
 
+        else: raise InputsError(("Inputs path doesn't lead to a valid"
+                                 " file, csv file or directory"))
+
 
 
     # Virtual Methods vvvvvvvvvvvvvvvvvvv
