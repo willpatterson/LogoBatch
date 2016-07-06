@@ -66,7 +66,6 @@ class TestBatch(unittest.TestCase):
         """
         Tests format_command
         TODO tests:
-            class attribute and CSV input markers
             execeptions and warnings
         """
 
@@ -88,6 +87,9 @@ class TestBatch(unittest.TestCase):
         assert(command == '{} 1 0 1 2 3'.format(sshb.batch_base))
 
         #Test CSV index exception
+        sshb.command_base = '{i10}'
+        self.assertRaises(IndexError, lambda: sshb.format_command(1,
+                                                                  inputs=('')))
 
 class TestSshBatch(unittest.TestCase):
     """ """
