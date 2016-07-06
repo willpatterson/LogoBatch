@@ -86,25 +86,6 @@ class Batch(object):
                                           " yaml object but input markers"
                                           " were found in your command"))
 
-    def build_inputs_path(self, inputs):
-        """
-        Builds a path for the inputs file
-        Throws an error if inputs path isn't valid
-        """
-
-        inserts = {}
-        if '{mod}' in inputs:
-            inserts["mod"] = self.batch_base
-        if '{in}' in inputs:
-            inserts["in"] = os.path.join(self.batch_base, 'in')
-        inputs = inputs.format(**inserts)
-
-        if not os.path.isfile(inputs):
-            raise NoInputsFileFoundError("message goes here") #TODO add message
-
-        return inputs
-
-
     def format_command(self, command_id, inputs=None, ignore_index=False):
         """
         Formats a command from the base command with class variables
