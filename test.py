@@ -56,15 +56,14 @@ class TestBatch(unittest.TestCase):
         """tests three outcomes of the generate inputs static method"""
 
         #CSV input parsing
-        split_csv = [x for x in Batch.generate_inputs(TEST_CSV)]
+        split_csv = list(Batch.generate_inputs(TEST_CSV))
         assert(split_csv == [{'1','2','3','4'},{'a','b','c','df'}])
 
         #Single file path yield
-        file_path = [x for x in Batch.generate_inputs(TEST_SINGLE_FILE)]
+        file_path = list(Batch.generate_inputs(TEST_SINGLE_FILE))
         assert(file_path == [os.path.realpath(TEST_SINGLE_FILE)])
 
         #Direcotry file yield
-        dir_list = [x for x in Batch.generate_inputs(TEST_DIR)]
         dir_list = list(Batch.generate_inputs(TEST_DIR))
         assert(dir_list == [os.path.realpath(os.path.join(TEST_DIR, 't1')),
                             os.path.realpath(os.path.join(TEST_DIR, 't2')),
