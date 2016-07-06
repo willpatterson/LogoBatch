@@ -83,6 +83,10 @@ class TestBatch(unittest.TestCase):
         command = sshb.format_command(1, inputs=('0','1','2','3'))
         assert(command == '1 0 1 2 3')
 
+        sshb.command_base = '{batch_base} {id} {i0} {i1} {i2} {i3}'
+        command = sshb.format_command(1, inputs=('0','1','2','3'))
+        assert(command == '{} 1 0 1 2 3'.format(sshb.batch_base))
+
         #Test CSV index exception
 
 class TestSshBatch(unittest.TestCase):
