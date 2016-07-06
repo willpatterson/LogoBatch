@@ -44,24 +44,34 @@ class TestBatch(unittest.TestCase):
     def test_generate_inputs(self):
         """tests three outcomes of the generate inputs static method"""
 
+        #CSV input parsing
         test_csv = 'test/input_test.csv'
         split_csv = [x for x in Batch.generate_inputs(test_csv)]
         print(split_csv)
         assert(split_csv == [{'1','2','3','4'},{'a','b','c','df'}])
 
+        #Single file path yield
         test_file = 'test/t_bbatch.yml'
         file_path = [x for x in Batch.generate_inputs(test_file)]
         assert(file_path == [os.path.realpath(test_file)])
 
+        #Direcotry file yield
         test_dir = 'test/input_dir_test'
         dir_list = [x for x in Batch.generate_inputs(test_dir)]
         print(dir_list)
         assert(dir_list == [os.path.realpath(os.path.join(test_dir, 't1')),
                             os.path.realpath(os.path.join(test_dir, 't2')),
                             os.path.realpath(os.path.join(test_dir, 't3'))])
-    """
+
     def test_format_command(self):
-    """
+        """
+        Tests following outcomes:
+            class attribute input markers
+            CSV input markers
+            class attribute and CSV input markers
+            execeptions and warnings
+        """
+    pass
 
 class TestSshBatch(unittest.TestCase):
     """ """
