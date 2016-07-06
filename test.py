@@ -57,7 +57,7 @@ class TestBatch(unittest.TestCase):
 
         #CSV input parsing
         split_csv = list(Batch.generate_inputs(TEST_CSV))
-        assert(split_csv == [{'1','2','3','4'},{'a','b','c','df'}])
+        assert(split_csv == [('1','2','3','4'),('a','b','c','df')])
 
         #Single file path yield
         file_path = list(Batch.generate_inputs(TEST_SINGLE_FILE))

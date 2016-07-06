@@ -133,7 +133,7 @@ class Batch(object):
         if os.path.isfile(path) and path.endswith('.csv'):
             with open(path, 'r') as uni:
                 for line in uni:
-                    yield set(line.strip('\n ,\t').split(','))
+                    yield tuple(line.strip('\n ,\t').split(','))
 
         #If file but not csv yield path to file
         elif os.path.isfile(path):
