@@ -68,6 +68,7 @@ class Batch(object):
         self.inputs = kwds.get('inputs', None)
         self.email = kwds.get('email', False)
         self.cpus = kwds.get('cpus', 1)
+        self.commands = []
 
         if re.match(r'\{i[0-9]+\}', self.command_base) and self.inputs is None:
             raise NoInputsFileFoundError(("No 'inputs' file was specifed in your"
@@ -107,14 +108,15 @@ class Batch(object):
         if inputs and not input_markers:
             print('Warning: You are passing input but no input markers found')
 
-        standard_markers = set(re.findall(r'\{.+\}', self.command_base))
+        standard_markers = set(re.findall(r'\{(.+?)\}', self.command_base))
         standard_markers = standard_markers - input_markers
+        print(standard_markers)
 
-        for sub in other:
+        for sub in standard_markers:
             format_var = self.__dict__.get(sub, '')
             inserts.update({sub: format_var})
 
-        self.commands.append(self.command_base.format(**inserts))
+        return self.command_base.format(**inserts)
 
     @staticmethod
     def generate_inputs(path):

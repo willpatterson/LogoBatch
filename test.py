@@ -71,7 +71,12 @@ class TestBatch(unittest.TestCase):
             class attribute and CSV input markers
             execeptions and warnings
         """
-    pass
+        class_attr_params = {'batch_type': 'ssh',
+                             'hostnames': ['test.local'],
+                             'command': '{batch_base} {name}'}
+        sshb = Batch(**class_attr_params)
+        command = sshb.format_command(1)
+        assert(command == '{} {}'.format(sshb.batch_base, sshb.name))
 
 class TestSshBatch(unittest.TestCase):
     """ """
