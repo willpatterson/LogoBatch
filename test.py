@@ -50,7 +50,6 @@ class TestBatch(unittest.TestCase):
 
         #CSV input parsing
         split_csv = [x for x in Batch.generate_inputs(TEST_CSV)]
-        print(split_csv)
         assert(split_csv == [{'1','2','3','4'},{'a','b','c','df'}])
 
         #Single file path yield
@@ -59,7 +58,6 @@ class TestBatch(unittest.TestCase):
 
         #Direcotry file yield
         dir_list = [x for x in Batch.generate_inputs(TEST_DIR)]
-        print(dir_list)
         assert(dir_list == [os.path.realpath(os.path.join(TEST_DIR, 't1')),
                             os.path.realpath(os.path.join(TEST_DIR, 't2')),
                             os.path.realpath(os.path.join(TEST_DIR, 't3'))])
@@ -80,6 +78,14 @@ class TestBatch(unittest.TestCase):
         sshb = Batch(**class_attr_params)
         command = sshb.format_command(1)
         assert(command == '{} {}'.format(sshb.batch_base, sshb.name))
+
+        """
+        #Test CSV input markers
+        sshb.command_base = 'ID: {i} {i0} {i1} {i2} {i3}'
+        command = sshb.format_command(1, inputs={'0','1','2','3'})
+        print(command)
+        assert(command == '1 0 1 2 3')
+        """
 
 class TestSshBatch(unittest.TestCase):
     """ """

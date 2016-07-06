@@ -98,10 +98,13 @@ class Batch(object):
         """
         Formats a command from the base command with class variables
         and adds them the the batches' command list
+        TODO:
+            Support input markers
         """
 
         inserts = {}
-        input_markers = set(re.findall(r'\{i[0-9]*\}', self.command_base))
+        input_markers = set(re.findall(r'\{(i[0-9]*)\}', self.command_base))
+        #print(input_markers)
 
         if input_markers and not inputs:
             raise Exception("") #TODO
@@ -110,7 +113,6 @@ class Batch(object):
 
         standard_markers = set(re.findall(r'\{(.+?)\}', self.command_base))
         standard_markers = standard_markers - input_markers
-        print(standard_markers)
 
         for sub in standard_markers:
             format_var = self.__dict__.get(sub, '')
