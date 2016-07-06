@@ -24,6 +24,10 @@ class TestBatchManager(unittest.TestCase):
         assert(isinstance(addresses, list))
         assert(addresses[0] == 'wpatt2@pdx.edu')
 
+TEST_CSV = 'test/input_test.csv'
+TEST_SINGLE_FILE = 'test/t_bbatch.yml'
+TEST_DIR = 'test/input_dir_test'
+
 class TestBatch(unittest.TestCase):
     """Test Class for Batch"""
 
@@ -45,38 +49,38 @@ class TestBatch(unittest.TestCase):
         """tests three outcomes of the generate inputs static method"""
 
         #CSV input parsing
-        test_csv = 'test/input_test.csv'
-        split_csv = [x for x in Batch.generate_inputs(test_csv)]
+        split_csv = [x for x in Batch.generate_inputs(TEST_CSV)]
         print(split_csv)
         assert(split_csv == [{'1','2','3','4'},{'a','b','c','df'}])
 
         #Single file path yield
-        test_file = 'test/t_bbatch.yml'
-        file_path = [x for x in Batch.generate_inputs(test_file)]
+        file_path = [x for x in Batch.generate_inputs(TEST_SINGLE_FILE)]
         assert(file_path == [os.path.realpath(test_file)])
 
         #Direcotry file yield
-        test_dir = 'test/input_dir_test'
-        dir_list = [x for x in Batch.generate_inputs(test_dir)]
+        dir_list = [x for x in Batch.generate_inputs(TEST_DIR)]
         print(dir_list)
-        assert(dir_list == [os.path.realpath(os.path.join(test_dir, 't1')),
-                            os.path.realpath(os.path.join(test_dir, 't2')),
-                            os.path.realpath(os.path.join(test_dir, 't3'))])
+        assert(dir_list == [os.path.realpath(os.path.join(TEST_DIR, 't1')),
+                            os.path.realpath(os.path.join(TEST_DIR, 't2')),
+                            os.path.realpath(os.path.join(TEST_DIR, 't3'))])
 
     def test_format_command(self):
         """
-        Tests following outcomes:
-            class attribute input markers
+        Tests format_command
+        TODO tests:
             CSV input markers
             class attribute and CSV input markers
             execeptions and warnings
         """
+
+        #Test class attribute input markers
         class_attr_params = {'batch_type': 'ssh',
                              'hostnames': ['test.local'],
                              'command': '{batch_base} {name}'}
         sshb = Batch(**class_attr_params)
         command = sshb.format_command(1)
         assert(command == '{} {}'.format(sshb.batch_base, sshb.name))
+
 
 class TestSshBatch(unittest.TestCase):
     """ """
