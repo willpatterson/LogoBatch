@@ -94,7 +94,7 @@ class Batch(object):
         return inputs
 
 
-    def format_command(self, command_id, inputs=None):
+    def format_command(self, command_id, inputs=None, ignore_index=False):
         """
         Formats a command from the base command with class variables
         and adds them the the batches' command list
@@ -103,16 +103,28 @@ class Batch(object):
         """
 
         inserts = {}
-        input_markers = set(re.findall(r'\{(i[0-9]*)\}', self.command_base))
-        #print(input_markers)
+        input_markers = set(re.findall(r'\{(i[0-9]+)\}', self.command_base))
 
-        if input_markers and not inputs:
+        if inputs and input_markers:
+            for marker in input_markers:
+                try:
+                    inserts.update({marker: inputs[int(marker.strip('i'))]})
+                except IndexError as ie:
+                    if ignore_index is False: raise ie #TODO maybe custom message
+                    else:
+                        print(('Warning: index {} is out of bownds. '
+                               'Inputing empty stirng.').format(marker),
+                               file=sys.stderr)
+                        inserts.update({marker: ''})
+        elif input_markers and not inputs:
             raise Exception("") #TODO
-        if inputs and not input_markers:
-            print('Warning: You are passing input but no input markers found')
+        elif inputs and not input_markers:
+            raise Exception("") #TODO
+
+        if '{id}' in self.command_base: inserts.update({'id': command_id})
 
         standard_markers = set(re.findall(r'\{(.+?)\}', self.command_base))
-        standard_markers = standard_markers - input_markers
+        standard_markers = standard_markers - input_markers - {'id'}
 
         for sub in standard_markers:
             format_var = self.__dict__.get(sub, '')

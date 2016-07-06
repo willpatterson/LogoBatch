@@ -66,7 +66,6 @@ class TestBatch(unittest.TestCase):
         """
         Tests format_command
         TODO tests:
-            CSV input markers
             class attribute and CSV input markers
             execeptions and warnings
         """
@@ -79,13 +78,12 @@ class TestBatch(unittest.TestCase):
         command = sshb.format_command(1)
         assert(command == '{} {}'.format(sshb.batch_base, sshb.name))
 
-        """
         #Test CSV input markers
-        sshb.command_base = 'ID: {i} {i0} {i1} {i2} {i3}'
-        command = sshb.format_command(1, inputs={'0','1','2','3'})
-        print(command)
+        sshb.command_base = '{id} {i0} {i1} {i2} {i3}'
+        command = sshb.format_command(1, inputs=('0','1','2','3'))
         assert(command == '1 0 1 2 3')
-        """
+
+        #Test CSV index exception
 
 class TestSshBatch(unittest.TestCase):
     """ """
