@@ -2,6 +2,7 @@ import unittest
 import os
 
 from logobatch.batches import Batch, SshBatch, SlurmBatch, LocalBatch
+from logobatch.batches import InputsError
 from logobatch.logobatch import BatchManager
 
 BATCH_BASE = "test/test_batch_base"
@@ -89,15 +90,17 @@ class TestBatch(unittest.TestCase):
 
         #Test CSV index exception
         sshb.command_base = '{i10}'
-        self.assertRaises(IndexError, lambda: sshb.format_command(1, inputs=INPUTS))
+        self.assertRaises(IndexError, lambda: sshb.format_command(1,
+                                                                  inputs=INPUTS))
 
         #Test input markers and no inputs
         sshb.command_base = '{i0} {i1} {i2} {i3}'
-        self.assertRaises(Exception, lambda: sshb.format_command(1))
+        self.assertRaises(InputsError, lambda: sshb.format_command(1))
 
         #Test input and not input markers
         sshb.command_base = '{batch_base}'
-        self.assertRaises(Exception, lambda: sshb.format_command(1, inputs=INPUTS))
+        self.assertRaises(InputsError, lambda: sshb.format_command(1,
+                                                                   inputs=INPUTS))
 
 
 class TestSshBatch(unittest.TestCase):

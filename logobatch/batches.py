@@ -36,6 +36,14 @@ class MissingAttributeError(Exception):
     def __init__(self, message):
         super(MissingAttributeError, self).__init__(message)
 
+class InputsError(Exception):
+    """
+    Error when incorrect combination of inputs and input markers
+    are passed into format_command
+    """
+    def __init__(self, message):
+        super(InputsError, self).__init__(message)
+
 
 class Batch(object):
     """
@@ -120,9 +128,11 @@ class Batch(object):
                                file=sys.stderr)
                         inserts.update({marker: ''})
         elif input_markers and not inputs:
-            raise Exception("") #TODO
+            raise InputsError(("Error: Input markers where found in"
+                              " command_base but no inputs were passed"))
         elif inputs and not input_markers:
-            raise Exception("") #TODO
+            raise InputsError(("Error: Inputs were passed but no input"
+                               "markers were found"))
 
         if '{id}' in self.command_base: inserts.update({'id': command_id})
 
