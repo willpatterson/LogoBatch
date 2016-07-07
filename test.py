@@ -2,8 +2,15 @@ import unittest
 import os
 import warnings
 
-from logobatch.batches import Batch, SshBatch, SlurmBatch, LocalBatch
+from logobatch.batches import Batch
+from logobatch.batches import SlurmBatch
+from logobatch.batches import SshBatch
+from logobatch.batches import LocalBatch
+from logobatch.batches import ThreadTest
+
 from logobatch.batches import InputsError, InvalidBatchTypeError
+from logobatch.batches import InvalidBatchTypeError
+
 from logobatch.logobatch import BatchManager
 
 BATCH_BASE = "test/test_batch_base"
@@ -40,6 +47,8 @@ class TestBatch(unittest.TestCase):
                       'command': 'test'}
         slurm_params = {'batch_type': 'slurm',
                         'command': 'test'}
+        tt_params = {'batch_type': 'local',
+                     'command': 'test'}
         local_params = {'batch_type': 'local',
                         'command': 'test'}
         typeless_params = {'command': 'test'}
@@ -47,6 +56,7 @@ class TestBatch(unittest.TestCase):
         #Test batch type creation
         assert(isinstance(Batch(**ssh_params), SshBatch))
         assert(isinstance(Batch(**slurm_params), SlurmBatch))
+        assert(isinstance(Batch(**tt_params), ThreadTest))
         assert(isinstance(Batch(**local_params), LocalBatch))
         assert(isinstance(Batch(**typeless_params), LocalBatch))
 
