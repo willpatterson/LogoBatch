@@ -42,6 +42,7 @@ class TestBatch(unittest.TestCase):
     """Test Class for Batch"""
 
     def test__new__factory(self):
+        """Test subclass object creation with Batch.__new__"""
         ssh_params = {'batch_type': 'ssh',
                       'hostnames': ['test.local'],
                       'command': 'test'}
@@ -66,6 +67,17 @@ class TestBatch(unittest.TestCase):
                            'command': 'test'}
         self.assertRaises(InvalidBatchTypeError,
                           lambda: Batch(**bad_type_params))
+
+    def test__init__(self):
+        """Test all possible outcomes of Batch._init__()"""
+        batch_params = {'command': '{id}',
+                        'batch_base': '',
+                        'executable': '',
+                        'name': '',
+                        'output', '',
+                        'inputs', '',
+                        'email', False,
+                        'cpus', ''}
 
     def test_generate_inputs(self):
         """tests three outcomes of the generate inputs static method"""
