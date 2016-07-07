@@ -1,5 +1,6 @@
 import unittest
 import os
+import warnings
 
 from logobatch.batches import Batch, SshBatch, SlurmBatch, LocalBatch
 from logobatch.batches import InputsError, InvalidBatchTypeError
@@ -79,8 +80,6 @@ class TestBatch(unittest.TestCase):
     def test_format_command(self):
         """
         Tests format_command
-        TODO tests:
-            warning
         """
 
         #Test class attribute input markers
@@ -114,6 +113,21 @@ class TestBatch(unittest.TestCase):
         sshb.command_base = '{batch_base}'
         self.assertRaises(InputsError,
                           lambda: sshb.format_command(1, inputs=INPUTS))
+
+        #Test Index warning: Ignore True
+        sshb.command_base = '{i0} {i1} {i2} {i6}'
+        with warnings.catch_warnings(record=True) as w:
+            command = sshb.format_command(1, inputs=INPUTS, ignore_index=True)
+            assert(command == '0 1 2 ')
+            assert(len(w) == 1)
+            assert(issubclass(w[-1].category, Warning))
+            assert('Index' in str(w[-1].message))
+
+        #Test Index warning: Ignore False
+        self.assertRaises(IndexError,
+                          lambda: sshb.format_command(1, inputs=INPUTS))
+
+
 
 
 class TestSshBatch(unittest.TestCase):
