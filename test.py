@@ -47,8 +47,9 @@ class TestBatch(unittest.TestCase):
                       'command': 'test'}
         slurm_params = {'batch_type': 'slurm',
                         'command': 'test'}
-        tt_params = {'batch_type': 'local',
-                     'command': 'test'}
+        tt_params = {'batch_type': 'threadtest',
+                     'command': 'test',
+                     'upper': 4}
         local_params = {'batch_type': 'local',
                         'command': 'test'}
         typeless_params = {'command': 'test'}

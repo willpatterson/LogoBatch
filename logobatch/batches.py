@@ -348,7 +348,10 @@ class ThreadTest(Batch):
         """
 
         super().__init__(**kwds)
-        self.upper = kwds.get('upper', raise_invalid_attribute(""))
+        self.upper = kwds.get('upper', "")
+        if self.upper is None or self.upper == "":
+            raise MissingAttributeError(("Attribute 'upper' is required for"
+                                         "Thread Test"))
         self.cpus = kwds.get('lower', 1)
 
     def create_commands(self):
