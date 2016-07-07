@@ -5,6 +5,7 @@ This file contains the batch classes
 import os
 import sys
 import re
+import warning
 
 from datetime import datetime
 
@@ -104,9 +105,8 @@ class Batch(object):
                 except IndexError as ie:
                     if ignore_index is False: raise ie #TODO maybe message
                     else:
-                        print(('Warning: index {} is out of bownds. '
-                               'Inputing empty stirng.').format(marker),
-                               file=sys.stderr)
+                        warnings.warn(("Index {} is out of bounds, replacing"
+                                       " with empty string").format(marker))
                         inserts.update({marker: ''})
         elif input_markers and not inputs:
             raise InputsError(("Error: Input markers where found in"
