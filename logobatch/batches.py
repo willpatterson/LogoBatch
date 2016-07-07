@@ -47,14 +47,9 @@ class InputsError(Exception):
 
 
 class Batch(object):
-    """
-    Base class for analysis and threadtest
-    TODO:
-        get rid of yaml_data!!! Get it its vairables into class attributes
-    """
+    """Base class for analysis and threadtest"""
 
     type_names = {}
-
     def __new__(cls, **kwds):
         """Creates and returns proper batch type"""
         batch_type = kwds.get('batch_type', 'local')
@@ -93,8 +88,6 @@ class Batch(object):
         """
         Formats a command from the base command with class variables
         and adds them the the batches' command list
-        TODO:
-            support warnings library
         """
 
         inserts = {}
@@ -163,13 +156,11 @@ class Batch(object):
         raise NotImplementedError()
 
     def launch_batch(self):
-        """
-        """
-
+        """ """
         raise NotImplementedError()
 
 class SlurmBatch(Batch):
-    """ A Batch object with inputs command parameters"""
+    """A Batch object with inputs command parameters"""
 
     type_names = {'slurm'}
     def __init__(self, **kwds):
