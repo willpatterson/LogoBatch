@@ -74,10 +74,10 @@ class TestBatch(unittest.TestCase):
                         'batch_base': '',
                         'executable': '',
                         'name': '',
-                        'output', '',
-                        'inputs', '',
-                        'email', False,
-                        'cpus', ''}
+                        'output': '',
+                        'inputs': '',
+                        'email': False,
+                        'cpus': ''}
 
     def test_generate_inputs(self):
         """tests three outcomes of the generate inputs static method"""
