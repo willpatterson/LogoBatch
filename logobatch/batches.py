@@ -5,7 +5,7 @@ This file contains the batch classes
 import os
 import sys
 import re
-import warning
+import warnings
 
 from datetime import datetime
 
@@ -83,7 +83,7 @@ class Batch(object):
         self.commands = []
 
         if re.match(r'\{i[0-9]+\}', self.command_base) and self.inputs is None:
-            raise NoInputsFileFoundError(("No 'inputs' was specifed in your"
+            raise NoInputsFileFoundError(("'inputs' was specifed in your"
                                           " yaml object but input markers"
                                           " were found in your command"))
 
