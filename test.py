@@ -8,8 +8,9 @@ from logobatch.batches import SshBatch
 from logobatch.batches import LocalBatch
 from logobatch.batches import ThreadTest
 
-from logobatch.batches import InputsError, InvalidBatchTypeError
+from logobatch.batches import InputsError
 from logobatch.batches import InvalidBatchTypeError
+from logobatch.batches import MissingAttributeError
 
 from logobatch.logobatch import BatchManager
 
@@ -70,13 +71,21 @@ class TestBatch(unittest.TestCase):
 
     def test__init__(self):
         """Test all possible outcomes of Batch._init__()"""
-        batch_params = {'command': '{id}',
+        #No Args:
+        self.assertRaises(MissingAttributeError, lambda: Batch.__init__(Batch))
+
+        #Empty command:
+        batch_params = {'command': ''}
+        self.assertRaises(ValueError,
+                          lambda: Batch.__init__(Batch, **batch_params))
+
+        batch_params = {'command': '',
                         'batch_base': '',
                         'executable': '',
                         'name': '',
                         'output': '',
                         'inputs': '',
-                        'email': False,
+                        'email': '',
                         'cpus': ''}
 
     def test_generate_inputs(self):
