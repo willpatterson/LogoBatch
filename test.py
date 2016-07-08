@@ -13,9 +13,12 @@ from logobatch.batches import InvalidBatchTypeError
 from logobatch.batches import MissingAttributeError
 
 from logobatch.logobatch import BatchManager
+from logobatch.logobatch import BBatchFormatError
 
-BATCH_BASE = "test/test_batch_base"
-BBATCH = "test/t_bbatch.yml"
+BATCH_BASE = 'test/test_batch_base'
+BBATCH = 'test/t_bbatch.yml'
+BAD_FORMAT_BB = 'test/bad_form_t_bbatch.yml'
+EMPTY_BBATCH = 'test/empty_t_bbatch.yml'
 
 class TestBatchManager(unittest.TestCase):
     """ Test Class for BatchManager"""
@@ -25,6 +28,8 @@ class TestBatchManager(unittest.TestCase):
 
     def test_parse_bbatch(self):
         """tests parse_bbatch method"""
+
+        #Test Good BBatch Format
         batches, addresses = self.bm.parse_bbatch(BBATCH)
         assert(isinstance(batches, list))
         assert(isinstance(batches[0], SshBatch))
@@ -33,6 +38,14 @@ class TestBatchManager(unittest.TestCase):
         assert(isinstance(batches[0].inputs, list))
         assert(isinstance(addresses, list))
         assert(addresses[0] == 'wpatt2@pdx.edu')
+
+        #Test Bad formatted BB file
+        self.assertRaises(BBatchFormatError,
+                          lambda: self.bm.parse_bbatch(BAD_FORMAT_BB))
+
+        #Test Empty BB file
+        self.assertRaises(BBatchFormatError,
+                          lambda: self.bm.parse_bbatch(EMPTY_BBATCH))
 
 TEST_CSV = 'test/input_test.csv'
 TEST_SINGLE_FILE = 'test/t_bbatch.yml'
