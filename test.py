@@ -173,8 +173,6 @@ class TestBatch(unittest.TestCase):
                           lambda: sshb.format_command(1, inputs=INPUTS))
 
 
-
-
 class TestSshBatch(unittest.TestCase):
     """ """
     def setUp(self):
