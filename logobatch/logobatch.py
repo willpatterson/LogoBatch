@@ -1,7 +1,4 @@
-"""
-Author: William Patterson
-"""
-
+"""File for Batch managment classes"""
 import yaml
 import datetime
 from collections import namedtuple
@@ -15,7 +12,6 @@ class BBatchFormatError(Exception):
     """Error thrown when yaml format is incorrect"""
     def __init__(self, message):
         super(BBatchFormatError, self).__init__(message)
-
 
 class BatchManager:
     """

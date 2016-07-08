@@ -45,7 +45,6 @@ class InputsError(Exception):
     def __init__(self, message):
         super(InputsError, self).__init__(message)
 
-
 class Batch(object):
     """Base class for analysis and threadtest"""
 

@@ -12,7 +12,6 @@ automate the process of running thousands of NetLogo models.
 **LogoBatch should be considered pre-release software.**
 LogoBatch is currently being refactored.
 
-
 Batch Directory
 ---------------
 

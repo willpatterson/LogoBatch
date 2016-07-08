@@ -1,3 +1,4 @@
+"""Unit Test File"""
 import unittest
 import os
 import warnings
@@ -7,7 +8,6 @@ from logobatch.batches import SlurmBatch
 from logobatch.batches import SshBatch
 from logobatch.batches import LocalBatch
 from logobatch.batches import ThreadTest
-
 from logobatch.batches import InputsError
 from logobatch.batches import InvalidBatchTypeError
 from logobatch.batches import MissingAttributeError
@@ -172,7 +172,6 @@ class TestBatch(unittest.TestCase):
         self.assertRaises(IndexError,
                           lambda: sshb.format_command(1, inputs=INPUTS))
 
-
 class TestSshBatch(unittest.TestCase):
     """ """
     def setUp(self):
@@ -193,4 +192,3 @@ if __name__ == '__main__':
 
     runner = unittest.TextTestRunner()
     runner.run(test_suite)
-
