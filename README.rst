@@ -12,11 +12,9 @@ automate the process of running thousands of NetLogo models.
 **LogoBatch should be considered pre-release software.**
 LogoBatch is currently being refactored.
 
-Batch Directory
----------------
-
-LogoBatch takes a batch directory as input. `batch_directory/in` is searched 
-for CSV files containing parameters to be passed to set shell commands.
+Batch Of Batches (BBatch)
+-------------------------
+As the name suggests, a BBatch is a set of batches defined in a YAML file to be passed to LogoBatch, which distributes them over your defined computing resources.
 
 Batch Directory structure:
 ==========================
