@@ -14,16 +14,24 @@ LogoBatch is currently being refactored.
 
 Batch Of Batches (BBatch)
 -------------------------
-As the name suggests, a BBatch is a set of batches defined in a YAML file to be passed to LogoBatch, which distributes them over your defined computing resources.
+As the name suggests, a BBatch is a set of batches defined in a YAML file
+to be passed to LogoBatch, which distributes them over your defined 
+computing resources.
 
-Batch Directory structure:
-==========================
+Batch Image
+-----------
+
+Batch Images are packages to be used to save and distribute batches. Batch
+Images can be created with using LogoBatch's utility ``makebimg``.
+
+Batch Image structure
+=====================
 
 ::
 
-    batch
+    batch_image
     |
-    +NetLogo input files
+    +required_input_files #Input files program needs (optional)
     |
     +in
     | |
