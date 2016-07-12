@@ -31,18 +31,19 @@ Batch Image structure
 
     batch_image
     |
-    +required_input_files #Input files program needs (optional)
+    +required_input_files #Input files required by batch programs (optional)
     |
     +in
     | |
-    |  +run.yml    #There can be multiple run.yml files.
-    |  +unique.csv #There can be multiple unique.csv files.
+    |  +bbatch_1.yml #There can be as many bbatches as necessary
+    |  +bbatch_2.yml #
+    |  +inputs.csv   #There can be as many input csv files as necessary
     |
     +out
        |
-       +Run1
+       +bbatch_1
        |  |    
-       |  +Analysis1
+       |  +batch_1
        |  |  |
        |  |  +Job1
        |  |  |  |
@@ -52,9 +53,9 @@ Batch Image structure
        |  |  |
        |  |  +Job2 ...
        |  |  
-       |  +Analysis2 ...  
+       |  +batch_2 ...  
        |
-       +Run2 ...
+       +bbatch_2 ...
     
 
 The ``out`` directory is created when you run LogoBatch. Output can be 
