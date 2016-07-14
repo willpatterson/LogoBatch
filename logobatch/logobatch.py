@@ -31,6 +31,27 @@ class BatchManager:
         self.batches, self.addresses = self.parse_bbatch(bbatch)
 
     @staticmethod
+    def parse_logobatch_config(lb_config):
+        """
+        Parses config file for logobatch's main settings from a config file,
+        typically found at: ~/.logobatch.yml
+        INPUT: path to the logobatch config file
+        OUTPUT: logobatch config data (compute/storage resources, email)
+        """
+        with open(bbatch, 'r') as yfile:
+            ydata = yaml.load(yfile)
+
+        compute = ydata.get('compute', None)
+        if computing_resources and not isinstance(computing_resources, list):
+            pass #TODO Add warning
+        storage = ydata.get('storage', None)
+        default_email = ydata.get('default_email', None)
+
+        LBConfigData = namedtuple('LBConfigData',
+                                  ['compute', 'storage', 'default_email'])
+        return LBConfigData(compute, storage, default_email)
+
+    @staticmethod
     def parse_bbatch(bbatch):
         """ reads bbatch yaml file into batches """
 
