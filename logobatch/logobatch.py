@@ -38,7 +38,8 @@ class BatchManager:
             ydata = yaml.load(yfile)
 
         batches = ydata.get('Batches', None)
-        if not isinstance(batches, list): raise BBatchFormatError('') #TODO add message
+        if not isinstance(batches, list):
+            raise BBatchFormatError('batches must be in a list')
         batches = [Batch(**b) for b in batches if b.get('enabled', False)]
         addresses = ydata.get('Email', None).get('addresses', None)
 
