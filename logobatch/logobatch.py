@@ -46,21 +46,8 @@ class BatchManager:
         BBatchData = namedtuple('BBatchData', ['batches', 'addresses'])
         return BBatchData(batches, addresses)
 
-
-    def create_commands(self):
-        """Triggers batch objects to create their commands"""
-
-        for batch in self.batches:
-            batch.create_commands()
-
-    def create_slurm_jobs(self):
-        """Triggers Batch objects to create their job files"""
-
-        for batch in self.batches:
-            batch.create_job_file(self.ntasks, self.email_info, self.name)
-
-    def schedule_batches(self):
+    def launch_batches(self):
         """Triggers Batch objects to schedule their job files"""
 
         for batch in self.batches:
-            batch.schedule_batch()
+            batch.launch_batch()
