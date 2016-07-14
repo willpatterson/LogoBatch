@@ -15,6 +15,12 @@ from logobatch.batches import MissingAttributeError
 from logobatch.logobatch import BatchManager
 from logobatch.logobatch import BBatchFormatError
 
+#LogoBatch Config Testing variables
+LB_CONFIG = 'test/t_lbconfig.yml'
+LB_CONFIG_BAD_FORMAT = 'test/t_lbconfig_bad_f.yml'
+LB_CONFIG_EMPTY = 'test/t_lbconfig_empty'
+
+#BBatch testing variables
 BATCH_BASE = 'test/test_batch_base'
 BBATCH = 'test/t_bbatch.yml'
 BAD_FORMAT_BB = 'test/bad_form_t_bbatch.yml'
@@ -25,6 +31,10 @@ class TestBatchManager(unittest.TestCase):
 
     def setUp(self):
         self.bm = BatchManager(BBATCH, BATCH_BASE)
+
+    def test_parse_logobatch_config(self):
+        """ """
+        pass
 
     def test_parse_bbatch(self):
         """tests parse_bbatch method"""
