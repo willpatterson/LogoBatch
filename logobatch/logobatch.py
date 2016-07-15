@@ -31,21 +31,26 @@ class BatchManager:
         self.batches, self.addresses = self.parse_bbatch(bbatch)
 
     @staticmethod
-    def parse_logobatch_config(lb_config):
+    def parse_logobatch_config(config_yml=None, **kwds):
         """
         Parses config file for logobatch's main settings from a config file,
         typically found at: ~/.logobatch.yml
-        INPUT: path to the logobatch config file
+        INPUT:
+            config_yml: path to the logobatch config file
+            **kwds: raw dictionary
         OUTPUT: logobatch config data (compute/storage resources, email)
         """
-        with open(bbatch, 'r') as yfile:
-            ydata = yaml.load(yfile)
+        try:
+            with open(config_yml, 'r') as yfile:
+                kwds = yaml.load(yfile)
+        except TypeError:
+            pass
 
-        compute = ydata.get('compute', None)
-        if computing_resources and not isinstance(computing_resources, list):
-            pass #TODO Add warning
-        storage = ydata.get('storage', None)
-        default_email = ydata.get('default_email', None)
+        compute = kwds.get('compute', None)
+        if compute and not isinstance(compute, list):
+            raise TypeError('Resources must be defined in YAML list 
+        storage = kwds.get('storage', None)
+        default_email = kwds.get('default_email', None)
 
         LBConfigData = namedtuple('LBConfigData',
                                   ['compute', 'storage', 'default_email'])
