@@ -24,8 +24,8 @@ class BatchManager:
        - building Batch objects
        - running Batch objects
     """
-    #namedtuple('UnparsedData', ['name', 'variables'])
-    #initial_raw_data = 
+    LBConfigData = namedtuple('LBConfigData',
+                              ['compute', 'storage', 'default_email'])
 
     def __init__(self, bbatch, outpath=None):
         """Initalizes all attributes """
@@ -54,9 +54,7 @@ class BatchManager:
         storage = kwds.get('storage', None)
         default_email = kwds.get('default_email', None)
 
-        LBConfigData = namedtuple('LBConfigData',
-                                  ['compute', 'storage', 'default_email'])
-        return LBConfigData(compute, storage, default_email)
+        return BatchManager.LBConfigData(compute, storage, default_email)
 
     @staticmethod
     def parse_bbatch(bbatch):

@@ -1,0 +1,26 @@
+default_email: example_email@gmail.com
+
+storage:
+  - name: remote1
+    hostname: remote1_nfs.rc.uni.edu
+
+  - name: cluster_shared
+    hostname: cluster_nfs.nfs.rc.uni.edu
+    default_path: /mnt/cluster_shared
+
+compute:
+  - name: Compute1
+    type: compute
+    hostname: compute1.rc.uni.edu
+    fast_storage: ['/disk/scratch', '/disk/scratch2']
+    remote_storage:
+      - name: remote1
+        path: /share/remote_nfs
+
+  - name: Cluster1
+    type: cluster_slurm
+    hostname: cluster1.rc.uni.edu
+    fast_storage: /disk/scratch
+    remote_storage:
+      - name: cluster_shared
+ 

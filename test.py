@@ -2,6 +2,7 @@
 import unittest
 import os
 import warnings
+from collections import namedtuple
 
 from logobatch.batches import Batch
 from logobatch.batches import SlurmBatch
@@ -19,6 +20,8 @@ from logobatch.logobatch import BBatchFormatError
 LB_CONFIG = 'test/t_lbconfig.yml'
 LB_CONFIG_BAD_FORMAT = 'test/t_lbconfig_bad_f.yml'
 LB_CONFIG_EMPTY = 'test/t_lbconfig_empty'
+LBConfigData = namedtuple('LBConfigData',
+                          ['compute', 'storage', 'default_email'])
 
 #BBatch testing variables
 BATCH_BASE = 'test/test_batch_base'
@@ -34,7 +37,8 @@ class TestBatchManager(unittest.TestCase):
 
     def test_parse_logobatch_config(self):
         """ """
-        pass
+        lbconf_data = self.bm.parse_logobatch_config(config_yml=LB_CONFIG)
+        assert(isinstance(lbconf_data, BatchManager.LBConfigData))
 
     def test_parse_bbatch(self):
         """tests parse_bbatch method"""
