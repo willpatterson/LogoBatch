@@ -24,6 +24,8 @@ class BatchManager:
        - building Batch objects
        - running Batch objects
     """
+    #namedtuple('UnparsedData', ['name', 'variables'])
+    #initial_raw_data = 
 
     def __init__(self, bbatch, outpath=None):
         """Initalizes all attributes """
@@ -48,7 +50,7 @@ class BatchManager:
 
         compute = kwds.get('compute', None)
         if compute and not isinstance(compute, list):
-            raise TypeError('Resources must be defined in YAML list 
+            raise TypeError('Resources must be defined in YAML list')
         storage = kwds.get('storage', None)
         default_email = kwds.get('default_email', None)
 
