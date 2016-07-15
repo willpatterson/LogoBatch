@@ -26,6 +26,7 @@ class BatchManager:
     """
     LBConfigData = namedtuple('LBConfigData',
                               ['compute', 'storage', 'default_email'])
+    BBatchData = namedtuple('BBatchData', ['batches', 'addresses'])
 
     def __init__(self, bbatch, outpath=None):
         """Initalizes all attributes """
@@ -57,20 +58,21 @@ class BatchManager:
         return BatchManager.LBConfigData(compute, storage, default_email)
 
     @staticmethod
-    def parse_bbatch(bbatch):
+    def parse_bbatch(bbatch_yml=None, **kwds):
         """ reads bbatch yaml file into batches """
+        try:
+            with open(bbatch_yml, 'r') as yfile:
+                kwds = yaml.load(yfile)
+        except TypeError:
+            pass
 
-        with open(bbatch, 'r') as yfile:
-            ydata = yaml.load(yfile)
-
-        batches = ydata.get('Batches', None)
+        batches = kwds.get('Batches', None)
         if not isinstance(batches, list):
             raise BBatchFormatError('batches must be in a list')
         batches = [Batch(**b) for b in batches if b.get('enabled', False)]
-        addresses = ydata.get('Email', None).get('addresses', None)
+        addresses = kwds.get('Email', None).get('addresses', None)
 
-        BBatchData = namedtuple('BBatchData', ['batches', 'addresses'])
-        return BBatchData(batches, addresses)
+        return BatchManager.BBatchData(batches, addresses)
 
     def launch_batches(self):
         """Triggers Batch objects to schedule their job files"""

@@ -44,7 +44,7 @@ class TestBatchManager(unittest.TestCase):
         """tests parse_bbatch method"""
 
         #Test Good BBatch Format
-        batches, addresses = self.bm.parse_bbatch(BBATCH)
+        batches, addresses = self.bm.parse_bbatch(bbatch_yml=BBATCH)
         assert(isinstance(batches, list))
         assert(isinstance(batches[0], SshBatch))
         assert(isinstance(batches[1], SlurmBatch))
