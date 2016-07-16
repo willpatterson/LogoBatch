@@ -99,24 +99,15 @@ class TestBatch(unittest.TestCase):
         self.assertRaises(InvalidBatchTypeError,
                           lambda: Batch(**bad_type_params))
 
-    def test__init__(self):
-        """Test all possible outcomes of Batch._init__()"""
-        #No Args:
+    def test__init__no_args(self):
+        """No Args"""
         self.assertRaises(AttributeError, lambda: Batch.__init__(Batch))
 
-        #Empty command:
+    def test__init__empty_command(self):
+        """Empty command"""
         batch_params = {'command': ''}
         self.assertRaises(ValueError,
                           lambda: Batch.__init__(Batch, **batch_params))
-
-        batch_params = {'command': '',
-                        'batch_base': '',
-                        'executable': '',
-                        'name': '',
-                        'output': '',
-                        'inputs': '',
-                        'email': '',
-                        'cpus': ''}
 
     def test_generate_inputs(self):
         """tests three outcomes of the generate inputs static method"""
