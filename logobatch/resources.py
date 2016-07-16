@@ -32,9 +32,8 @@ class RemoteLauncher(Launcher):
         """ """
         #Test ssh connection
         self.ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(hostname)
-
+        self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        self.ssh.connect(hostname)
 
 class LocalLauncher(Launcher):
     pass
