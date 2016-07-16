@@ -31,9 +31,11 @@ EMPTY_BBATCH = 'test/empty_t_bbatch.yml'
 
 class TestBatchManager(unittest.TestCase):
     """ Test Class for BatchManager"""
+    bm = None
 
-    def setUp(self):
-        self.bm = BatchManager(BBATCH, BATCH_BASE)
+    @classmethod
+    def setUpClass(cls):
+        cls.bm = BatchManager(BBATCH, BATCH_BASE)
 
     def test_parse_logobatch_config(self):
         """ """
