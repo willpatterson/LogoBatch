@@ -71,9 +71,7 @@ class Resource(object):
 
     def __init__(self, name, hostname=None, **kwds):
         self.name = name
-
-        if hostname is None: self.launcher = LocalLauncher()
-        else: self.launcher = RemoteLauncher(hostname)
+        self.launcher = Launcher(hostname)
 
 class ComputeServer(Resource):
     """
