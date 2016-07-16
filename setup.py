@@ -1,8 +1,8 @@
 from setuptools import setup, find_packages
 
 setup(name="logopipe",
-      version="0.0.2",
-      description="Creates, schedules, and pipes output for jobs in slurm. This Release is BETA 1.0",
+      version="0.0.0",
+      description="Creates, schedules, and pipes output for jobs in slurm.",
       license="MIT",
       author="William Patterson",
       packages=find_packages(),
