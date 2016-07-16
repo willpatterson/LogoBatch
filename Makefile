@@ -1,4 +1,4 @@
-.PHONY: init dev-clean install-clean clean travis-test
+.PHONY: init dev-clean install-clean clean test
 
 init:
 	-mkdir .env
@@ -9,7 +9,7 @@ init:
 	python setup.py develop
 
 test:
-	python -m coverage run -m unittest discover
+	coverage run -m unittest discover
 
 clean:
 	$(CLEAN)
