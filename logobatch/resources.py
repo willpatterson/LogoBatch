@@ -6,6 +6,16 @@ import socket
 import paramiko
 
 class Launcher:
+    """
+    Base class for the lancher objects used to dispatch shell commands
+    to local and remote resources
+    """
+    def __new__(cls, hostname):
+        if hostname is None:
+            return super(Launcher, cls).__new__(LocalLauncher)
+        else:
+            return super(Launcher, cls).__new__(RemoteLauncher)
+
     def create_background_command(self, command_number=None):
         """Creates command to be sent over ssh"""
         if command_number is None:
@@ -29,8 +39,8 @@ class Launcher:
 
 class RemoteLauncher(Launcher):
     """
-    Remote Launcher is class used to launch shell commands on remote
-    machines via ssh as well as deal with resulting output transfers
+    Used to launch shell commands on remote machines via ssh as well
+    as deal with input file and resulting output file transfers
     """
     def __init__(self, hostname):
         """ """
@@ -40,17 +50,24 @@ class RemoteLauncher(Launcher):
         self.ssh.connect(hostname)
 
 class LocalLauncher(Launcher):
+    """Used to launch shell commands on the local machine"""
     pass
 
 class Resource(object):
+    """
+    Base class for Resource objects used to launch jobs on different types
+    of remote and local computing resources
+    Base class acts as a factory for computing resources
+    """
+
     type_names = {}
     def __new__(cls, **kwds):
         """Creates and returns proper resource object type"""
         resource_type = kwds.get('resource_type', 'local')
         for sub_cls in cls.__subclasses__():
             if resource_type in sub_cls.type_names:
-                return super(resource, cls).__new__(sub_cls)
-        raise TypeError("Resource type doesn't exist: {}".format(batch_type))
+                return super(Resource, cls).__new__(sub_cls)
+        raise TypeError("Resource doesn't exist: {}".format(resource_type))
 
     def __init__(self, name, hostname=None, **kwds):
         self.name = name
@@ -59,6 +76,11 @@ class Resource(object):
         else: self.launcher = RemoteLauncher(hostname)
 
 class ComputeServer(Resource):
+    """
+    Resource subclass for dispactching jobs to a single, logical
+    unix computer
+    """
+
     type_names = {'compute_server'}
     def __init__(self, name, **kwds):
         super.__init__(self, name)
@@ -66,5 +88,6 @@ class ComputeServer(Resource):
         self.command_number = kwds.get('command_number', 1)
 
 class SlurmCluster(ComputeCompute):
+    """Resource subclass for dispactching jobs to a slurm cluster"""
     type_names = {'slurm_cluster'}
 
