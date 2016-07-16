@@ -7,6 +7,6 @@ setup(name="logopipe",
       author="William Patterson",
       packages=find_packages(),
       package_data={'logopipe': ['*.yml', '*.txt', '*.sh']},
-      install_requires=["PyYaml"],
+      install_requires=["PyYaml", "paramiko"],
       long_description="long_description",
       entry_points={"console_scripts": ["logopipe=logopipe.__main__:main",]})
