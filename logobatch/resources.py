@@ -3,16 +3,24 @@
 import os
 import sys
 
-class storage_resource(object):
+class resource(object):
+    def __init__(self, name):
+        self.name = name
+
+class remote_compute(resource):
+    def __init__(self, name, hostname):
+        super.__init__(self, name)
+        self.hostname = hostname
+
+class local_storage(resource):
     def __init__(self, name, hostname, default_path=None):
         self.name = name
         self.hostname = name
         self.default_path = default_path
 
-class compute_resource(object):
+class remote_compute(remote_resource):
     def __init__(self, name, hostname):
-        self.name = name
-        self.hostname = name
+        self.
         self.remote_storage = None
         self.fast_storage = None
 
