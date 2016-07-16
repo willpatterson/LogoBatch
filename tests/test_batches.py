@@ -1,8 +1,10 @@
-"""Unit Test File"""
 import unittest
 import os
 import warnings
 from collections import namedtuple
+import sys
+
+sys.path.append(os.path.abspath('..'))
 
 from logobatch.batches import Batch
 from logobatch.batches import SlurmBatch
@@ -13,61 +15,11 @@ from logobatch.batches import InputsError
 from logobatch.batches import InvalidBatchTypeError
 from logobatch.batches import MissingAttributeError
 
-from logobatch.logobatch import BatchManager
-
-#LogoBatch Config Testing variables
-LB_CONFIG = 'test/t_lbconfig.yml'
-LB_CONFIG_BAD_FORMAT = 'test/t_lbconfig_bad_f.yml'
-LB_CONFIG_EMPTY = 'test/t_lbconfig_empty'
-LBConfigData = namedtuple('LBConfigData',
-                          ['compute', 'storage', 'default_email'])
-
-#BBatch testing variables
-BATCH_BASE = 'test/test_batch_base'
-BBATCH = 'test/t_bbatch.yml'
-BAD_FORMAT_BB = 'test/bad_form_t_bbatch.yml'
-EMPTY_BBATCH = 'test/empty_t_bbatch.yml'
-
-class TestBatchManager(unittest.TestCase):
-    """ Test Class for BatchManager"""
-    bm = None
-
-    @classmethod
-    def setUpClass(cls):
-        cls.bm = BatchManager(BBATCH, BATCH_BASE)
-
-    def test_parse_logobatch_config_namedtuple_type(self):
-        """ """
-        lbconf_data = self.bm.parse_logobatch_config(config_yml=LB_CONFIG)
-        assert(isinstance(lbconf_data, BatchManager.LBConfigData))
-
-    def test_parse_bbatch(self):
-        """tests parse_bbatch method"""
-
-        #Test Good BBatch Format
-        batches, addresses = self.bm.parse_bbatch(bbatch_yml=BBATCH)
-        assert(isinstance(batches, list))
-        assert(isinstance(batches[0], SshBatch))
-        assert(isinstance(batches[1], SlurmBatch))
-        assert(batches[0].name == 'sshb')
-        assert(isinstance(batches[0].inputs, list))
-        assert(isinstance(addresses, list))
-        assert(addresses[0] == 'wpatt2@pdx.edu')
-
-    def test_parse_bbatch_bad_format_error(self):
-        """Test Bad formatted BB file"""
-        self.assertRaises(AttributeError,
-                          lambda: self.bm.parse_bbatch(BAD_FORMAT_BB))
-
-    def test_parse_bbatch_empty_bbatch(self):
-        """Test Empty BB file error"""
-        self.assertRaises(RuntimeError,
-                          lambda: self.bm.parse_bbatch(EMPTY_BBATCH))
-
-TEST_CSV = 'test/input_test.csv'
-TEST_SINGLE_FILE = 'test/t_bbatch.yml'
-TEST_DIR = 'test/input_dir_test'
+TEST_CSV = 'tests/input_test.csv'
+TEST_SINGLE_FILE = 'tests/t_bbatch.yml'
+TEST_DIR = 'tests/input_dir_test'
 INPUTS = ('0', '1', '2', '3')
+
 
 class TestBatch(unittest.TestCase):
     """Test Class for Batch"""
@@ -132,49 +84,59 @@ class TestBatch(unittest.TestCase):
         self.assertRaises(InputsError,
                           lambda: list(Batch.generate_inputs('asdf')))
 
-    def test_format_command_attribute_input_markers(self):
-        """Test class attribute input markers"""
+class TestBatchFormatCommand(unittest.TestCase):
+    """Test class for Batch format_command method"""
+    sshb = None
+
+    @classmethod
+    def setUpClass(cls):
         class_attr_params = {'batch_type': 'ssh',
                              'hostnames': ['test.local'],
                              'command': '{batch_base} {name}'}
-        sshb = Batch(**class_attr_params)
-        command = sshb.format_command(1)
-        assert(command == '{} {}'.format(sshb.batch_base, sshb.name))
+        cls.sshb = Batch(**class_attr_params)
+
+
+    def test_format_command_attribute_input_markers(self):
+        """Test class attribute input markers"""
+        command = self.sshb.format_command(1)
+        assert(command == '{} {}'.format(self.sshb.batch_base, self.sshb.name))
 
     def test_format_command_csv_inputs(self):
         """Test CSV input markers"""
-        sshb.command_base = '{id} {i0} {i1} {i2} {i3}'
-        command = sshb.format_command(1, inputs=INPUTS)
+        self.sshb.command_base = '{id} {i0} {i1} {i2} {i3}'
+        command = self.sshb.format_command(1, inputs=INPUTS)
         assert(command == '1 0 1 2 3')
 
     def test_format_command_csv_inputs_with_batch_base(self):
-        sshb.command_base = '{batch_base} {id} {i0} {i1} {i2} {i3}'
-        command = sshb.format_command(1, inputs=INPUTS)
-        assert(command == '{} 1 0 1 2 3'.format(sshb.batch_base))
+        self.sshb.command_base = '{batch_base} {id} {i0} {i1} {i2} {i3}'
+        command = self.sshb.format_command(1, inputs=INPUTS)
+        assert(command == '{} 1 0 1 2 3'.format(self.sshb.batch_base))
 
     def test_format_command_csv_bad_index(self):
         """Test CSV index exception"""
-        sshb.command_base = '{i10}'
+        self.sshb.command_base = '{i10}'
         self.assertRaises(IndexError,
-                          lambda: sshb.format_command(1, inputs=INPUTS))
+                          lambda: self.sshb.format_command(1, inputs=INPUTS))
 
     def test_format_command_makers_but_not_inputs(self):
         """Test input markers and no inputs"""
-        sshb.command_base = '{i0} {i1} {i2} {i3}'
+        self.sshb.command_base = '{i0} {i1} {i2} {i3}'
         self.assertRaises(InputsError,
-                          lambda: sshb.format_command(1))
+                          lambda: self.sshb.format_command(1))
 
     def test_format_command_input_but_no_markers(self):
         """Test input and not input markers"""
-        sshb.command_base = '{batch_base}'
+        self.sshb.command_base = '{batch_base}'
         self.assertRaises(InputsError,
-                          lambda: sshb.format_command(1, inputs=INPUTS))
+                          lambda: self.sshb.format_command(1, inputs=INPUTS))
 
     def test_format_command_index_warning_ignore_true(self):
         """Test Index warning: Ignore True"""
-        sshb.command_base = '{i0} {i1} {i2} {i6}'
+        self.sshb.command_base = '{i0} {i1} {i2} {i6}'
         with warnings.catch_warnings(record=True) as w:
-            command = sshb.format_command(1, inputs=INPUTS, ignore_index=True)
+            command = self.sshb.format_command(1,
+                                               inputs=INPUTS,
+                                               ignore_index=True)
             assert(command == '0 1 2 ')
             assert(len(w) == 1)
             assert(issubclass(w[-1].category, Warning))
@@ -182,23 +144,12 @@ class TestBatch(unittest.TestCase):
 
     def test_format_command_index_warning_ignore_flase(self):
         """Test Index warning: Ignore False"""
+        self.sshb.command_base = '{i0} {i1} {i2} {i6}'
         self.assertRaises(IndexError,
-                          lambda: sshb.format_command(1, inputs=INPUTS))
-
-class TestSshBatch(unittest.TestCase):
-    """ """
-    def setUp(self):
-        bm = BatchManager(BBATCH, BATCH_BASE)
-        self.ssh_batch = bm.batches[0]
-
-class TestSlurmBatch(unittest.TestCase):
-    """ """
-    def setUp(self):
-        bm = BatchManager(BBATCH, BATCH_BASE)
-        self.slurm_batch = bm.batches[1]
+                          lambda: self.sshb.format_command(1, inputs=INPUTS))
 
 if __name__ == '__main__':
-    test_classes = (TestBatch, TestBatchManager)
+    test_classes = (TestBatch, TestBatchFormatCommand)
     test_suite = unittest.TestSuite()
     for test_class in test_classes:
         test_suite.addTest(test_class())
