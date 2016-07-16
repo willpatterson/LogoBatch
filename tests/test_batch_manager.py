@@ -38,10 +38,6 @@ class TestBatchManager(unittest.TestCase):
 
 class TestLogoBatchConfigParse(TestBatchManager):
     """"""
-    def setUpClass(cls):
-        """Creates class BatchManager object"""
-        cls.bm = BatchManager(BBATCH, BATCH_BASE)
-
     def test_parse_logobatch_config_namedtuple_type(self):
         """tests type of named tuple from parse_logobatch_config"""
         lbconf_data = self.bm.parse_logobatch_config(config_yml=LB_CONFIG)
