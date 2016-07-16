@@ -2,6 +2,8 @@
 
 import os
 import sys
+import socket
+import paramiko
 
 class Launcher:
      def create_background_command(self, command_number=None):
@@ -22,7 +24,18 @@ class Launcher:
         return compound_commands
 
 class RemoteLauncher(Launcher):
-    pass
+    """
+    Remote Launcher is class used to launch shell commands on remote
+    machines via ssh as well as deal with resulting output transfers
+    """
+    def __init__(self, hostname):
+        """ """
+        #Test ssh connection
+        self.ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(hostname)
+
+
 class LocalLauncher(Launcher):
     pass
 
