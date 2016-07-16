@@ -1,5 +1,5 @@
 Batches: 
     Batch1:
-        - name: test
+        name: test
     Batch2:
-        - name: test
+        name: test

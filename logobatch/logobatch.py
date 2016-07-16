@@ -1,17 +1,13 @@
 """File for Batch managment classes"""
 import yaml
 import datetime
+import warnings
 from collections import namedtuple
 
 import os, sys
 sys.path.append(os.path.abspath(".."))
 
 from logobatch.batches import Batch
-
-class BBatchFormatError(Exception):
-    """Error thrown when yaml format is incorrect"""
-    def __init__(self, message):
-        super(BBatchFormatError, self).__init__(message)
 
 class BatchManager:
     """
@@ -50,6 +46,7 @@ class BatchManager:
             pass
 
         compute = kwds.get('compute', None)
+        compute = kwds.get('compute', None)
         if compute and not isinstance(compute, list):
             raise TypeError('Resources must be defined in YAML list')
         storage = kwds.get('storage', None)
@@ -67,9 +64,20 @@ class BatchManager:
             pass
 
         batches = kwds.get('Batches', None)
-        if not isinstance(batches, list):
-            raise BBatchFormatError('batches must be in a list')
-        batches = [Batch(**b) for b in batches if b.get('enabled', False)]
+        if isinstance(batches, list) or\
+           isinstance(batches, set) or\
+           isinstance(batches, tuple):
+            batches = [Batch(**b) for b in batches if b.get('enabled', False)]
+        elif batches is None:
+            raise RuntimeError('No batches specified')
+        else:
+            warnings.warn(('batches were defined in a non-standard way,'
+                           ' some settings might be lost'), RuntimeWarning)
+            if isinstance(batches, dict):
+                batches = [Batch(**val) for _, val in batches.items()]
+            else:
+                batches = [Batch(**batches)]
+
         addresses = kwds.get('Email', None).get('addresses', None)
 
         return BatchManager.BBatchData(batches, addresses)

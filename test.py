@@ -14,7 +14,6 @@ from logobatch.batches import InvalidBatchTypeError
 from logobatch.batches import MissingAttributeError
 
 from logobatch.logobatch import BatchManager
-from logobatch.logobatch import BBatchFormatError
 
 #LogoBatch Config Testing variables
 LB_CONFIG = 'test/t_lbconfig.yml'
@@ -37,7 +36,7 @@ class TestBatchManager(unittest.TestCase):
     def setUpClass(cls):
         cls.bm = BatchManager(BBATCH, BATCH_BASE)
 
-    def test_parse_logobatch_config(self):
+    def test_parse_logobatch_config_namedtuple_type(self):
         """ """
         lbconf_data = self.bm.parse_logobatch_config(config_yml=LB_CONFIG)
         assert(isinstance(lbconf_data, BatchManager.LBConfigData))
@@ -55,12 +54,14 @@ class TestBatchManager(unittest.TestCase):
         assert(isinstance(addresses, list))
         assert(addresses[0] == 'wpatt2@pdx.edu')
 
-        #Test Bad formatted BB file
-        self.assertRaises(BBatchFormatError,
+    def test_parse_bbatch_bad_format_error(self):
+        """Test Bad formatted BB file"""
+        self.assertRaises(AttributeError,
                           lambda: self.bm.parse_bbatch(BAD_FORMAT_BB))
 
-        #Test Empty BB file
-        self.assertRaises(BBatchFormatError,
+    def test_parse_bbatch_empty_bbatch(self):
+        """Test Empty BB file error"""
+        self.assertRaises(RuntimeError,
                           lambda: self.bm.parse_bbatch(EMPTY_BBATCH))
 
 TEST_CSV = 'test/input_test.csv'
@@ -101,7 +102,7 @@ class TestBatch(unittest.TestCase):
     def test__init__(self):
         """Test all possible outcomes of Batch._init__()"""
         #No Args:
-        self.assertRaises(MissingAttributeError, lambda: Batch.__init__(Batch))
+        self.assertRaises(AttributeError, lambda: Batch.__init__(Batch))
 
         #Empty command:
         batch_params = {'command': ''}

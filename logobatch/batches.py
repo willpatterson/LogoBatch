@@ -63,7 +63,7 @@ class Batch(object):
         """ """
         self.command_base = kwds.get('command', None) #Required
         if self.command_base is None:
-            raise MissingAttributeError('Missing command')
+            raise AttributeError('Missing command')
         elif self.command_base == '':
             raise ValueError("command must not be empty")
 
