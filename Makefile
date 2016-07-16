@@ -5,11 +5,11 @@ init:
 	virtualenv .env
 	pip install --upgrade pip
 	pip install --upgrade setuptools
+	pip install -r requirements.txt
 	python setup.py develop
 
-
-travis-test:
-	python -m unittest discover
+test:
+	python -m coverage run -m unittest discover
 
 clean:
 	$(CLEAN)
