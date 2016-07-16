@@ -3,42 +3,49 @@
 import os
 import sys
 
-class resource(object):
+class Launcher:
+     def create_background_command(self, command_number=None):
+        """Creates command to be sent over ssh"""
+        if command_number is None:
+            try: command_number = self.command_number
+            except AttributeError: command_number = 1
+
+        raw_commands = []
+        for inputs_item in self.generate_inputs():
+            raw_commands.append(self.format_command(inputs_item))
+
+        commands = []
+        for i in range(0, len(tmp_commands), command_number):
+            command_set = raw_commands[i:i+command_number]
+            commands.append('({})&'.format('; '.join(command_set)))
+
+        return compound_commands
+
+class RemoteLauncher(Launcher):
+    pass
+class LocalLauncher(Launcher):
+    pass
+
+class Resource(object):
+    type_names = {}
+    def __new__(cls, **kwds):
+        """Creates and returns proper batch type"""
+        resource_type = kwds.get('resource_type', 'local')
+        for sub_cls in cls.__subclasses__():
+            if resource_type in sub_cls.type_names:
+                return super(resource, cls).__new__(sub_cls)
+        raise TypeError("Resource type doesn't exist: {}".format(batch_type))
+
     def __init__(self, name):
         self.name = name
 
-class remote_compute(resource):
-    def __init__(self, name, hostname):
+class ComputeServer(Resource):
+    type_names = {'compute_server'}
+    def __init__(self, name, hostname=None, **kwds):
         super.__init__(self, name)
         self.hostname = hostname
+        self.command_number = kwds.get('command_number', 1)
 
-class local_storage(resource):
-    def __init__(self, name, hostname, default_path=None):
-        self.name = name
-        self.hostname = name
-        self.default_path = default_path
+class SlurmCluster(ComputeCompute):
+    type_names = {'slurm_cluster'}
 
-class remote_compute(remote_resource):
-    def __init__(self, name, hostname):
-        self.
-        self.remote_storage = None
-        self.fast_storage = None
-
-    def run_jobs(self):
-        """ """
-        raise NotImplementedError
-
-class local_compute(compute_resource):
-    pass
-
-class compute_server(compute_resource):
-    pass
-
-class compute_cluster(compute_resource):
-    pass
-
-class slurm_cluster(compute_cluster):
-    pass
-
-class sge_cluster(compute_cluster):
-    pass
