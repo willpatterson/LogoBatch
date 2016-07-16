@@ -1,6 +1,9 @@
 .. image:: https://travis-ci.org/willpatterson/LogoBatch.svg?branch=master
     :target: https://travis-ci.org/willpatterson/LogoBatch
 
+.. image:: https://coveralls.io/repos/github/willpatterson/LogoBatch/badge.svg?branch=master 
+    :target: https://coveralls.io/github/willpatterson/LogoBatch?branch=master
+
 *********
 LogoBatch
 *********
