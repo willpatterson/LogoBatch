@@ -29,18 +29,25 @@ BAD_FORMAT_BB = 'tests/bad_form_t_bbatch.yml'
 EMPTY_BBATCH = 'tests/empty_t_bbatch.yml'
 
 class TestBatchManager(unittest.TestCase):
-    """ Test Class for BatchManager"""
+    """Base test class for BatchManager"""
     bm = None
-
     @classmethod
     def setUpClass(cls):
+        """Creates class BatchManager object"""
+        cls.bm = BatchManager(BBATCH, BATCH_BASE)
+
+class TestLogoBatchConfigParse(TestBatchManager):
+    """"""
+    def setUpClass(cls):
+        """Creates class BatchManager object"""
         cls.bm = BatchManager(BBATCH, BATCH_BASE)
 
     def test_parse_logobatch_config_namedtuple_type(self):
-        """ """
+        """tests type of named tuple from parse_logobatch_config"""
         lbconf_data = self.bm.parse_logobatch_config(config_yml=LB_CONFIG)
         assert(isinstance(lbconf_data, BatchManager.LBConfigData))
 
+class TestBatchManagerParseBBatch(TestBatchManager):
     def test_parse_bbatch(self):
         """tests parse_bbatch method"""
 
@@ -64,27 +71,8 @@ class TestBatchManager(unittest.TestCase):
         self.assertRaises(RuntimeError,
                           lambda: self.bm.parse_bbatch(EMPTY_BBATCH))
 
-TEST_CSV = 'test/input_test.csv'
-TEST_SINGLE_FILE = 'test/t_bbatch.yml'
-TEST_DIR = 'test/input_dir_test'
-INPUTS = ('0', '1', '2', '3')
-
-
-
-class TestSshBatch(unittest.TestCase):
-    """ """
-    def setUp(self):
-        bm = BatchManager(BBATCH, BATCH_BASE)
-        self.ssh_batch = bm.batches[0]
-
-class TestSlurmBatch(unittest.TestCase):
-    """ """
-    def setUp(self):
-        bm = BatchManager(BBATCH, BATCH_BASE)
-        self.slurm_batch = bm.batches[1]
-
 if __name__ == '__main__':
-    test_classes = (TestBatchManager)
+    test_classes = (TestBatchManagerParseBBatch, TestLogoBatchConfigParse)
     test_suite = unittest.TestSuite()
     for test_class in test_classes:
         test_suite.addTest(test_class())
