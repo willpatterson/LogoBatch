@@ -29,19 +29,22 @@ class LocalLauncher(Launcher):
 class Resource(object):
     type_names = {}
     def __new__(cls, **kwds):
-        """Creates and returns proper batch type"""
+        """Creates and returns proper resource object type"""
         resource_type = kwds.get('resource_type', 'local')
         for sub_cls in cls.__subclasses__():
             if resource_type in sub_cls.type_names:
                 return super(resource, cls).__new__(sub_cls)
         raise TypeError("Resource type doesn't exist: {}".format(batch_type))
 
-    def __init__(self, name):
+    def __init__(self, name, hostname=None, **kwds):
         self.name = name
+
+        if hostname is None: self.launcher = LocalLauncher()
+        else: self.launcher = RemoteLauncher(hostname)
 
 class ComputeServer(Resource):
     type_names = {'compute_server'}
-    def __init__(self, name, hostname=None, **kwds):
+    def __init__(self, name, **kwds):
         super.__init__(self, name)
         self.hostname = hostname
         self.command_number = kwds.get('command_number', 1)
