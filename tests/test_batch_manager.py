@@ -5,10 +5,6 @@ import warnings
 from collections import namedtuple
 
 from logobatch.batches import Batch
-from logobatch.batches import SlurmBatch
-from logobatch.batches import SshBatch
-from logobatch.batches import LocalBatch
-from logobatch.batches import ThreadTest
 from logobatch.batches import InputsError
 from logobatch.batches import InvalidBatchTypeError
 from logobatch.batches import MissingAttributeError
@@ -44,15 +40,13 @@ class TestLogoBatchConfigParse(TestBatchManager):
         assert(isinstance(lbconf_data, BatchManager.LBConfigData))
 
 class TestBatchManagerParseBBatch(TestBatchManager):
+    """ """
     def test_parse_bbatch(self):
         """tests parse_bbatch method"""
 
         #Test Good BBatch Format
         batches, addresses = self.bm.parse_bbatch(bbatch_yml=BBATCH)
         assert(isinstance(batches, list))
-        assert(isinstance(batches[0], SshBatch))
-        assert(isinstance(batches[1], SlurmBatch))
-        assert(batches[0].name == 'sshb')
         assert(isinstance(batches[0].inputs, list))
         assert(isinstance(addresses, list))
         assert(addresses[0] == 'wpatt2@pdx.edu')

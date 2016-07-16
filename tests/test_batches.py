@@ -7,10 +7,6 @@ import sys
 sys.path.append(os.path.abspath('..'))
 
 from logobatch.batches import Batch
-from logobatch.batches import SlurmBatch
-from logobatch.batches import SshBatch
-from logobatch.batches import LocalBatch
-from logobatch.batches import ThreadTest
 from logobatch.batches import InputsError
 from logobatch.batches import InvalidBatchTypeError
 from logobatch.batches import MissingAttributeError
@@ -23,33 +19,6 @@ INPUTS = ('0', '1', '2', '3')
 
 class TestBatch(unittest.TestCase):
     """Test Class for Batch"""
-
-    def test__new__factory(self):
-        """Test subclass object creation with Batch.__new__"""
-        ssh_params = {'batch_type': 'ssh',
-                      'hostnames': ['test.local'],
-                      'command': 'test'}
-        slurm_params = {'batch_type': 'slurm',
-                        'command': 'test'}
-        tt_params = {'batch_type': 'threadtest',
-                     'command': 'test',
-                     'upper': 4}
-        local_params = {'batch_type': 'local',
-                        'command': 'test'}
-        typeless_params = {'command': 'test'}
-
-        #Test batch type creation
-        assert(isinstance(Batch(**ssh_params), SshBatch))
-        assert(isinstance(Batch(**slurm_params), SlurmBatch))
-        assert(isinstance(Batch(**tt_params), ThreadTest))
-        assert(isinstance(Batch(**local_params), LocalBatch))
-        assert(isinstance(Batch(**typeless_params), LocalBatch))
-
-        #Test incorrect batch type error
-        bad_type_params = {'batch_type': 'bad',
-                           'command': 'test'}
-        self.assertRaises(InvalidBatchTypeError,
-                          lambda: Batch(**bad_type_params))
 
     def test__init__no_args(self):
         """No Args"""
