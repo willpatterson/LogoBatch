@@ -6,7 +6,7 @@ import socket
 import paramiko
 
 class Launcher:
-     def create_background_command(self, command_number=None):
+    def create_background_command(self, command_number=None):
         """Creates command to be sent over ssh"""
         if command_number is None:
             try: command_number = self.command_number
@@ -22,6 +22,10 @@ class Launcher:
             commands.append('({})&'.format('; '.join(command_set)))
 
         return compound_commands
+
+    def launch_job(self, command):
+        """Virtual Abstract method"""
+        raise NotImplementedError
 
 class RemoteLauncher(Launcher):
     """
