@@ -109,6 +109,7 @@ class TestBatch(unittest.TestCase):
         self.assertRaises(ValueError,
                           lambda: Batch.__init__(Batch, **batch_params))
 
+    #TEST GENERATE INPUTS######################################################
     def test_generate_inputs_csv_yield(self):
         """CSV input parsing"""
         split_csv = list(Batch.generate_inputs(TEST_CSV))
@@ -131,12 +132,8 @@ class TestBatch(unittest.TestCase):
         self.assertRaises(InputsError,
                           lambda: list(Batch.generate_inputs('asdf')))
 
-    def test_format_command(self):
-        """
-        Tests format_command
-        """
-
-        #Test class attribute input markers
+    def test_format_command_attribute_input_markers(self):
+        """Test class attribute input markers"""
         class_attr_params = {'batch_type': 'ssh',
                              'hostnames': ['test.local'],
                              'command': '{batch_base} {name}'}
@@ -144,31 +141,37 @@ class TestBatch(unittest.TestCase):
         command = sshb.format_command(1)
         assert(command == '{} {}'.format(sshb.batch_base, sshb.name))
 
-        #Test CSV input markers
+    def test_format_command_csv_inputs(self):
+        """Test CSV input markers"""
         sshb.command_base = '{id} {i0} {i1} {i2} {i3}'
         command = sshb.format_command(1, inputs=INPUTS)
         assert(command == '1 0 1 2 3')
 
+    def test_format_command_csv_inputs_with_batch_base(self):
         sshb.command_base = '{batch_base} {id} {i0} {i1} {i2} {i3}'
         command = sshb.format_command(1, inputs=INPUTS)
         assert(command == '{} 1 0 1 2 3'.format(sshb.batch_base))
 
-        #Test CSV index exception
+    def test_format_command_csv_bad_index(self):
+        """Test CSV index exception"""
         sshb.command_base = '{i10}'
         self.assertRaises(IndexError,
                           lambda: sshb.format_command(1, inputs=INPUTS))
 
-        #Test input markers and no inputs
+    def test_format_command_makers_but_not_inputs(self):
+        """Test input markers and no inputs"""
         sshb.command_base = '{i0} {i1} {i2} {i3}'
         self.assertRaises(InputsError,
                           lambda: sshb.format_command(1))
 
-        #Test input and not input markers
+    def test_format_command_input_but_no_markers(self):
+        """Test input and not input markers"""
         sshb.command_base = '{batch_base}'
         self.assertRaises(InputsError,
                           lambda: sshb.format_command(1, inputs=INPUTS))
 
-        #Test Index warning: Ignore True
+    def test_format_command_index_warning_ignore_true(self):
+        """Test Index warning: Ignore True"""
         sshb.command_base = '{i0} {i1} {i2} {i6}'
         with warnings.catch_warnings(record=True) as w:
             command = sshb.format_command(1, inputs=INPUTS, ignore_index=True)
@@ -177,7 +180,8 @@ class TestBatch(unittest.TestCase):
             assert(issubclass(w[-1].category, Warning))
             assert('Index' in str(w[-1].message))
 
-        #Test Index warning: Ignore False
+    def test_format_command_index_warning_ignore_flase(self):
+        """Test Index warning: Ignore False"""
         self.assertRaises(IndexError,
                           lambda: sshb.format_command(1, inputs=INPUTS))
 
