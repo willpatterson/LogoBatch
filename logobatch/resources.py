@@ -4,12 +4,14 @@ import os
 import sys
 import socket
 import paramiko
+import subprocess
 
 class Launcher:
     """
     Base class for the lancher objects used to dispatch shell commands
     to local and remote resources
     """
+    JobOut = namedtuple('JobOut', ['output', 'error'])
     def __new__(cls, hostname):
         if hostname is None:
             return super(Launcher, cls).__new__(LocalLauncher)
@@ -44,14 +46,31 @@ class RemoteLauncher(Launcher):
     """
     def __init__(self, hostname):
         """ """
-        #Test ssh connection
+        #Test and setup ssh connection
         self.ssh = paramiko.SSHClient()
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         self.ssh.connect(hostname)
 
+    def launch_job(self, command):
+        """ """
+        if not isinstance(command, str):
+            try:
+                command = ' '.join(command)
+            except TypeError:
+                raise TypeError('Launch job requires a string or iterable')
+
+        ssh_stdin, ssh_stdout, ssh_stderr = self.ssh.exec_command(command)
+        return self.JobOut(ssh_stdout, ssh_stderr)
+
+
 class LocalLauncher(Launcher):
     """Used to launch shell commands on the local machine"""
-    pass
+    def launch_job(self, command):
+        """ """
+        process = subprocess.Popen(command,
+                                   shell=False,
+                                   stdout=subprocess.PIPE)
+        return self.JobOut(process.communicate())
 
 class Resource(object):
     """
@@ -90,4 +109,3 @@ class SlurmCluster(ComputeCompute):
     type_names = {'slurm_cluster'}
     def __init__(self, name, hostname=None, **kwds):
         super().__init__(self, name, hostname=hostname, **kwds)
-
