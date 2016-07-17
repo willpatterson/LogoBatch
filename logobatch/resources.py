@@ -35,7 +35,7 @@ class Launcher:
 
         return compound_commands
 
-    def launch_job(self, command):
+    def launch_command(self, command):
         """Virtual Abstract method"""
         raise NotImplementedError
 
@@ -51,7 +51,7 @@ class RemoteLauncher(Launcher):
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         self.ssh.connect(hostname)
 
-    def launch_job(self, command):
+    def launch_command(self, command):
         """ """
         if not isinstance(command, str):
             try:
@@ -65,7 +65,7 @@ class RemoteLauncher(Launcher):
 
 class LocalLauncher(Launcher):
     """Used to launch shell commands on the local machine"""
-    def launch_job(self, command):
+    def launch_command(self, command):
         """ """
         process = subprocess.Popen(command,
                                    shell=False,
