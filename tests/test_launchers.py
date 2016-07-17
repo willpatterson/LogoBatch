@@ -18,6 +18,10 @@ class TestLauncherBase(unittest.TestCase):
         """
         self.assertRaises(socket.gaierror, lambda: Launcher(' '))
 
+    def test_launch_command(self):
+        self.assertRaises(NotImplementedError,
+                          lambda: Launcher.launch_command(Launcher, ''))
+
 if __name__ == '__main__':
     test_classes = (TestLauncherBase)
     test_suite = unittest.TestSuite()
