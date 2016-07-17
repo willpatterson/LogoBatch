@@ -80,12 +80,14 @@ class ComputeServer(Resource):
     """
 
     type_names = {'compute_server'}
-    def __init__(self, name, **kwds):
-        super.__init__(self, name)
-        self.hostname = hostname
+    def __init__(self, name, hostname=None, **kwds):
+        super().__init__(self, name, hostname=hostname, **kwds)
         self.command_number = kwds.get('command_number', 1)
 
 class SlurmCluster(ComputeCompute):
     """Resource subclass for dispactching jobs to a slurm cluster"""
+
     type_names = {'slurm_cluster'}
+    def __init__(self, name, hostname=None, **kwds):
+        super().__init__(self, name, hostname=hostname, **kwds)
 
