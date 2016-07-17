@@ -132,6 +132,23 @@ class Batch(object):
         else: raise InputsError(("Inputs path doesn't lead to a valid"
                                  " file, csv file or directory"))
 
+class Command(object):
+    """Represents a valid shell command"""
+    def __init__(self, executable, body):
+        self.executable = executable
+        self.body = body
+
+    def __str__(self):
+        """Str function for creating command string"""
+        return ' '.join([self.executable, self.body])
+
+    def __iter__(self):
+        """Iterator for running with subprocess"""
+        yield self.executable
+        yield self.body
+
+
+
 class ThreadTest(Batch):
     """
     A batch object that is used to run identical commands with
