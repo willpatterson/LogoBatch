@@ -3,10 +3,10 @@
 init:
 	-mkdir .env
 	virtualenv .env
-	pip install --upgrade pip
-	pip install --upgrade setuptools
-	pip install -r requirements.txt
-	python setup.py develop
+	.env/bin/pip install --upgrade pip
+	.env/bin/pip install --upgrade setuptools
+	.env/bin/pip install -r requirements.txt
+	.env/bin/python setup.py develop
 
 test:
 	coverage run -m unittest discover
