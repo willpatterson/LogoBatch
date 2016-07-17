@@ -11,6 +11,8 @@ from logobatch.batches import InputsError
 from logobatch.batches import InvalidBatchTypeError
 from logobatch.batches import MissingAttributeError
 
+from logobatch.batches import Command
+
 TEST_CSV = 'tests/input_test.csv'
 TEST_SINGLE_FILE = 'tests/t_bbatch.yml'
 TEST_DIR = 'tests/input_dir_test'
@@ -117,8 +119,27 @@ class TestBatchFormatCommand(unittest.TestCase):
         self.assertRaises(IndexError,
                           lambda: self.sshb.format_command(1, inputs=INPUTS))
 
+EXECUTABLE = 'which'
+BODY = 'which'
+VALID_STR_COMMAND = EXECUTABLE + ' ' + BODY
+VALID_ITER = [EXECUTABLE, BODY]
+class TestCommand(unittest.TestCase):
+    """Tests Command class"""
+    cmd = None
+    @classmethod
+    def setUpClass(cls):
+        cls.cmd = Command(EXECUTABLE, BODY)
+
+    def test__str__(self):
+        """Tests __str__ method of Command"""
+        self.assertEqual(str(self.cmd), VALID_STR_COMMAND)
+
+    def test__iter__(self):
+        """Tests if __iter__ yields attributes in the right order"""
+        self.assertEqual(list(self.cmd), VALID_ITER)
+
 if __name__ == '__main__':
-    test_classes = (TestBatch, TestBatchFormatCommand)
+    test_classes = (TestBatch, TestBatchFormatCommand, TestCommand)
     test_suite = unittest.TestSuite()
     for test_class in test_classes:
         test_suite.addTest(test_class())
