@@ -20,22 +20,26 @@ class Launcher:
         else:
             return super(Launcher, cls).__new__(RemoteLauncher)
 
-    def create_background_command(self, command_number=None):
-        """Creates command to be sent over ssh"""
-        if command_number is None:
-            try: command_number = self.command_number
-            except AttributeError: command_number = 1
+    def create_background_command(self, commands):
+        """
+        Recievces a single command or a set of commands as input
+        Makes a single command out of the command(s) that will run in
+        background
+        """
+        """
+        if not isinstance(commands, str):
+            try:
+                command = ' '.join(command)
+            except TypeError:
+                command = str(command)
 
-        raw_commands = []
-        for inputs_item in self.generate_inputs():
-            raw_commands.append(self.format_command(inputs_item))
-
-        commands = []
         for i in range(0, len(tmp_commands), command_number):
             command_set = raw_commands[i:i+command_number]
-            commands.append('({})&'.format('; '.join(command_set)))
 
+        commands.append('({})&'.format('; '.join(command_set)))
         return compound_commands
+        """
+        pass
 
     def launch_command(self, command):
         """Virtual Abstract method"""
