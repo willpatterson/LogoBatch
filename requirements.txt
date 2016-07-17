@@ -1,4 +1,4 @@
 coveralls==1.1
 pylint==1.6.2
 PyYaml==3.11
-paramiko=2.0.1
+paramiko==2.0.1
