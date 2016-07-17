@@ -6,6 +6,8 @@ import socket
 import paramiko
 import subprocess
 
+from collections import namedtuple
+
 class Launcher:
     """
     Base class for the lancher objects used to dispatch shell commands
@@ -103,7 +105,7 @@ class ComputeServer(Resource):
         super().__init__(self, name, hostname=hostname, **kwds)
         self.command_number = kwds.get('command_number', 1)
 
-class SlurmCluster(ComputeCompute):
+class SlurmCluster(ComputeServer):
     """Resource subclass for dispactching jobs to a slurm cluster"""
 
     type_names = {'slurm_cluster'}
