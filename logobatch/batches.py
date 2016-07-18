@@ -12,11 +12,6 @@ from datetime import datetime
 sys.path.append("..")
 from logobatch.email_notice import Email
 
-class NoSlurmTemplateError(Exception):
-    """Error when no batchfile is found"""
-    def __init__(self, message):
-        super(NoSlurmTemplateError, self).__init__(message)
-
 class InvalidExecutableError(Exception):
     """Error thrown when executable doesn't exist"""
     def __init__(self, message):
@@ -26,16 +21,6 @@ class NoInputsError(Exception):
     """Error when no input sources are found"""
     def __init__(self, message):
         super(NoInputsError, self).__init__(message)
-
-class InvalidBatchTypeError(Exception):
-    """Error thrown when batch type isn't supported"""
-    def __init__(self, message):
-        super(InvalidBatchTypeError, self).__init__(message)
-
-class MissingAttributeError(Exception):
-    """Error thrown when batch type isn't supported"""
-    def __init__(self, message):
-        super(MissingAttributeError, self).__init__(message)
 
 class InputsError(Exception):
     """
@@ -147,8 +132,6 @@ class Command(object):
         yield self.executable
         yield self.body
 
-
-
 class ThreadTest(Batch):
     """
     A batch object that is used to run identical commands with
@@ -172,8 +155,8 @@ class ThreadTest(Batch):
         super().__init__(**kwds)
         self.upper = kwds.get('upper', "")
         if self.upper is None or self.upper == "":
-            raise MissingAttributeError(("Attribute 'upper' is required for"
-                                         "Thread Test"))
+            raise AttributeError(("Attribute 'upper' is required 
+                                  "for Thread Test"))
         self.cpus = kwds.get('lower', 1)
 
     def create_commands(self):
