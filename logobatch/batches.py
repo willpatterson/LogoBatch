@@ -155,7 +155,7 @@ class ThreadTest(Batch):
         super().__init__(**kwds)
         self.upper = kwds.get('upper', "")
         if self.upper is None or self.upper == "":
-            raise AttributeError(("Attribute 'upper' is required 
+            raise AttributeError(("Attribute 'upper' is required"
                                   "for Thread Test"))
         self.cpus = kwds.get('lower', 1)
 
