@@ -6,8 +6,6 @@ from collections import namedtuple
 
 from logobatch.batches import Batch
 from logobatch.batches import InputsError
-from logobatch.batches import InvalidBatchTypeError
-from logobatch.batches import MissingAttributeError
 
 from logobatch.logobatch import BatchManager
 

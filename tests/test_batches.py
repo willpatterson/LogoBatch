@@ -8,8 +8,6 @@ sys.path.append(os.path.abspath('..'))
 
 from logobatch.batches import Batch
 from logobatch.batches import InputsError
-from logobatch.batches import InvalidBatchTypeError
-from logobatch.batches import MissingAttributeError
 
 from logobatch.batches import Command
 
