@@ -8,7 +8,7 @@ import subprocess
 
 from collections import namedtuple
 
-class Launcher:
+class Launcher(object):
     """
     Base class for the lancher objects used to dispatch shell commands
     to local and remote resources
@@ -43,7 +43,7 @@ class Launcher:
 
     def launch_command(self, command):
         """Virtual Abstract method"""
-        raise NotImplementedError
+        raise NotImplementedError("Implement in subclass")
 
 class RemoteLauncher(Launcher):
     """
