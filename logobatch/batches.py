@@ -78,10 +78,10 @@ class Batch(object):
                         inserts.update({marker: ''})
         elif input_markers and not inputs:
             raise InputsError(("Error: Input markers where found in"
-                              " command_base but no inputs were passed"))
+                               "command_base but no inputs were passed"))
         elif inputs and not input_markers:
-            raise InputsError(("Error: Inputs were passed but no input"
-                               "markers were found"))
+            raise InputsError(("Error: Inputs were passed but"
+                               " no input markers were found"))
 
         if '{id}' in self.command_base: inserts.update({'id': command_id})
 
