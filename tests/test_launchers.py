@@ -1,5 +1,4 @@
 import unittest
-import socket
 
 from logobatch.resources import Launcher
 from logobatch.resources import LocalLauncher
@@ -24,14 +23,22 @@ class TestLauncherBase(unittest.TestCase):
         #self.assertRaises(socket.gaierror, lambda: Launcher(' '))
         pass
 
-    def test_launch_command(self):
+    def test_launch_command_error(self):
+        """Tests that launch_command is not Implemented """
         self.assertRaises(NotImplementedError,
                           lambda: Launcher.launch_command(Launcher, ''))
 
-    def test_create_background_command_single_str(self):
+    def test_create_bg_cmd_str(self):
         """Test create_background_command method for a single string"""
         self.assertEqual(VALID_BG_CMD,
                          Launcher.create_background_command('echo test'))
+
+    def test_create_bg_cmd_multi(self):
+        """Test create_background_command"""
+        self.assertEqual(VALID_BG_CMD_MULTI,
+                         Launcher.create_background_command(('echo test',
+                                                             'echo test2')))
+
 
 if __name__ == '__main__':
     TEST_CLASSES = (TestLauncherBase,)

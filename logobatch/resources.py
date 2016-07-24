@@ -27,7 +27,7 @@ class Launcher(object):
         Makes a single command out of the command(s) that will run in
         background
         """
-        if not isinstance(commands, str):
+        if isinstance(commands, str):
             commands = [commands]
         return '({})&'.format('; '.join(commands))
 
