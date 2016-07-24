@@ -5,9 +5,15 @@ from logobatch.resources import Launcher
 from logobatch.resources import LocalLauncher
 from logobatch.resources import RemoteLauncher
 
+VALID_BG_CMD = '(echo test)&'
+VALID_BG_CMD_MULTI = '(echo test; echo test2; )&'
 class TestLauncherBase(unittest.TestCase):
-    def test__new__factory_local(self):
-        assert(isinstance(Launcher(None), LocalLauncher))
+    """Tests for Lancher, the base class of RemoteLauncher and LocalLauncher"""
+
+    @staticmethod
+    def test__new__factory_local():
+        """tests if Lanucher passed None creates LocalLauncher object"""
+        assert isinstance(Launcher(None), LocalLauncher)
 
     def test__new__factory_remote(self):
         """
@@ -22,11 +28,16 @@ class TestLauncherBase(unittest.TestCase):
         self.assertRaises(NotImplementedError,
                           lambda: Launcher.launch_command(Launcher, ''))
 
-if __name__ == '__main__':
-    test_classes = (TestLauncherBase)
-    test_suite = unittest.TestSuite()
-    for test_class in test_classes:
-        test_suite.addTest(test_class())
+    def test_create_background_command_single_str(self):
+        """Test create_background_command method for a single string"""
+        self.assertEqual(VALID_BG_CMD,
+                         Launcher.create_background_command('echo test'))
 
-    runner = unittest.TextTestRunner()
-    runner.run(test_suite)
+if __name__ == '__main__':
+    TEST_CLASSES = (TestLauncherBase,)
+    TEST_SUITE = unittest.TestSuite()
+    for test_class in TEST_CLASSES:
+        TEST_SUITE.addTest(test_class())
+
+    RUNNER = unittest.TextTestRunner()
+    RUNNER.run(TEST_SUITE)
