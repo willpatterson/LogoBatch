@@ -5,6 +5,7 @@
 .DS_Store
 __pycache__/
 test.txt
+coverage.xml
 
 logopipe.egg-info/
 build/
