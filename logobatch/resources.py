@@ -20,26 +20,16 @@ class Launcher(object):
         else:
             return super(Launcher, cls).__new__(RemoteLauncher)
 
-    def create_background_command(self, commands):
+    @staticmethod
+    def create_background_command(commands):
         """
         Recievces a single command or a set of commands as input
         Makes a single command out of the command(s) that will run in
         background
         """
-        """
         if not isinstance(commands, str):
-            try:
-                command = ' '.join(command)
-            except TypeError:
-                command = str(command)
-
-        for i in range(0, len(tmp_commands), command_number):
-            command_set = raw_commands[i:i+command_number]
-
-        commands.append('({})&'.format('; '.join(command_set)))
-        return compound_commands
-        """
-        pass
+            commands = [commands]
+        return '({})&'.format('; '.join(commands))
 
     def launch_command(self, command):
         """Virtual Abstract method"""
