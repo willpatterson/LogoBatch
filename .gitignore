@@ -4,6 +4,7 @@
 *.pyc
 .DS_Store
 __pycache__/
+test.txt
 
 logopipe.egg-info/
 build/
