@@ -41,7 +41,7 @@ class BatchManager:
         """
         try:
             with open(config_yml, 'r') as yfile:
-                kwds = yaml.load(yfile)
+                kwds = yaml.safe_load(yfile)
         except TypeError:
             pass
 
