@@ -1,8 +1,9 @@
 .. image:: https://travis-ci.org/willpatterson/LogoBatch.svg?branch=master
     :target: https://travis-ci.org/willpatterson/LogoBatch
 
-.. image:: https://coveralls.io/repos/github/willpatterson/LogoBatch/badge.svg?branch=master 
-    :target: https://coveralls.io/github/willpatterson/LogoBatch?branch=master
+.. image:: https://api.codacy.com/project/badge/Coverage/d2ae03a947f1499486897e6c6f53e36e    
+    :target: https://www.codacy.com/app/wpatt2/LogoBatch?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=willpatterson/LogoBatch&amp;utm_campaign=Badge_Coverage
+
 
 *********
 LogoBatch
