@@ -5,7 +5,7 @@ from logobatch.resources import LocalLauncher
 from logobatch.resources import RemoteLauncher
 
 VALID_BG_CMD = '(echo test)&'
-VALID_BG_CMD_MULTI = '(echo test; echo test2; )&'
+VALID_BG_CMD_MULTI = '(echo test; echo test2)&'
 class TestLauncherBase(unittest.TestCase):
     """Tests for Lancher, the base class of RemoteLauncher and LocalLauncher"""
 
