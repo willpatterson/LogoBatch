@@ -1,4 +1,5 @@
-coveralls==1.1
+coverage==4.1
+coday-coverage==1.2.18
 pylint==1.6.2
 PyYaml==3.11
 paramiko==2.0.1
