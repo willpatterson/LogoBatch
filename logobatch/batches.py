@@ -53,9 +53,9 @@ class Batch(object):
         self.commands = []
 
         if re.match(r'\{i[0-9]+\}', self.command_base) and self.inputs is None:
-            raise NoInputsFileFoundError(("'inputs' was specifed in your"
-                                          " yaml object but input markers"
-                                          " were found in your command"))
+            raise ValueError(("'inputs' was specifed in your"
+                              " yaml object but input markers"
+                              " were found in your command"))
 
     def format_command(self, command_id, inputs=None, ignore_index=False):
         """
@@ -70,8 +70,9 @@ class Batch(object):
             for marker in input_markers:
                 try:
                     inserts.update({marker: inputs[int(marker.strip('i'))]})
-                except IndexError as ie:
-                    if ignore_index is False: raise ie #TODO maybe message
+                except IndexError as inderr:
+                    if ignore_index is False:
+                        raise inderr #TODO maybe message
                     else:
                         warnings.warn(("Index {} is out of bounds, replacing"
                                        " with empty string").format(marker))
@@ -83,7 +84,8 @@ class Batch(object):
             raise InputsError(("Error: Inputs were passed but"
                                " no input markers were found"))
 
-        if '{id}' in self.command_base: inserts.update({'id': command_id})
+        if '{id}' in self.command_base:
+            inserts.update({'id': command_id})
 
         standard_markers = set(re.findall(r'\{(.+?)\}', self.command_base))
         standard_markers = standard_markers - input_markers - {'id'}
@@ -109,11 +111,12 @@ class Batch(object):
 
         #If path dir yield all file paths in dir
         elif os.path.isdir(path):
-            for fi in os.listdir(path):
-                fipath = os.path.join(os.path.realpath(path), fi)
+            for i in os.listdir(path):
+                fipath = os.path.join(os.path.realpath(path), i)
                 if os.path.isfile(fipath):
                     yield fipath
 
+        #TODO replace with standard python exception
         else: raise InputsError(("Inputs path doesn't lead to a valid"
                                  " file, csv file or directory"))
 
