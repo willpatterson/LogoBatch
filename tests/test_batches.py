@@ -1,7 +1,7 @@
+"""Tests for the Batch Class"""
 import unittest
 import os
 import warnings
-from collections import namedtuple
 import sys
 
 sys.path.append(os.path.abspath('..'))
@@ -34,12 +34,13 @@ class TestBatch(unittest.TestCase):
     def test_generate_inputs_csv_yield(self):
         """CSV input parsing"""
         split_csv = list(Batch.generate_inputs(TEST_CSV))
-        assert(split_csv == [('1','2','3','4'),('a','b','c','df')])
+        self.assertEqual(split_csv,
+                         [('1', '2', '3', '4'), ('a', 'b', 'c', 'df')])
 
     def test_generate_inputs_file_yield(self):
         """Single file path yield"""
         file_path = list(Batch.generate_inputs(TEST_SINGLE_FILE))
-        assert(file_path == [os.path.realpath(TEST_SINGLE_FILE)])
+        self.assertEqual(file_path, [os.path.realpath(TEST_SINGLE_FILE)])
 
     def test_generate_inputs_directory_yield(self):
         """Direcotry file yield"""
@@ -68,18 +69,20 @@ class TestBatchFormatCommand(unittest.TestCase):
     def test_format_command_attribute_input_markers(self):
         """Test class attribute input markers"""
         command = self.sshb.format_command(1)
-        assert(command == '{} {}'.format(self.sshb.batch_base, self.sshb.name))
+        self.assertEqual(command, '{} {}'.format(self.sshb.batch_base,
+                                                 self.sshb.name))
 
     def test_format_command_csv_inputs(self):
         """Test CSV input markers"""
         self.sshb.command_base = '{id} {i0} {i1} {i2} {i3}'
         command = self.sshb.format_command(1, inputs=INPUTS)
-        assert(command == '1 0 1 2 3')
+        self.assertEqual(command, '1 0 1 2 3')
 
     def test_format_command_csv_inputs_with_batch_base(self):
+        """ """
         self.sshb.command_base = '{batch_base} {id} {i0} {i1} {i2} {i3}'
         command = self.sshb.format_command(1, inputs=INPUTS)
-        assert(command == '{} 1 0 1 2 3'.format(self.sshb.batch_base))
+        self.assertEqual(command, '{} 1 0 1 2 3'.format(self.sshb.batch_base))
 
     def test_format_command_csv_bad_index(self):
         """Test CSV index exception"""
@@ -106,10 +109,10 @@ class TestBatchFormatCommand(unittest.TestCase):
             command = self.sshb.format_command(1,
                                                inputs=INPUTS,
                                                ignore_index=True)
-            assert(command == '0 1 2 ')
-            assert(len(w) == 1)
-            assert(issubclass(w[-1].category, Warning))
-            assert('Index' in str(w[-1].message))
+            self.assertEqual(command, '0 1 2 ')
+            self.assertEqual(len(w), 1)
+            assert issubclass(w[-1].category, Warning)
+            assert 'Index' in str(w[-1].message)
 
     def test_format_command_index_warning_ignore_flase(self):
         """Test Index warning: Ignore False"""
@@ -137,10 +140,10 @@ class TestCommand(unittest.TestCase):
         self.assertEqual(list(self.cmd), VALID_ITER)
 
 if __name__ == '__main__':
-    test_classes = (TestBatch, TestBatchFormatCommand, TestCommand)
-    test_suite = unittest.TestSuite()
-    for test_class in test_classes:
-        test_suite.addTest(test_class())
+    TEST_CLASSES = (TestBatch, TestBatchFormatCommand, TestCommand)
+    TEST_SUITE = unittest.TestSuite()
+    for test_class in TEST_CLASSES:
+        TEST_SUITE.addTest(test_class())
 
-    runner = unittest.TextTestRunner()
-    runner.run(test_suite)
+    RUNNER = unittest.TextTestRunner()
+    RUNNER.run(TEST_SUITE)
