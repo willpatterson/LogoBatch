@@ -98,7 +98,11 @@ class Batch(object):
 
     @staticmethod
     def generate_inputs(path):
-        """Opens a file with inputs entries and yields them"""
+        """Yields (depending on the input path):
+            * each line of tab-delimted file
+            * every file in a directory
+            * a single file path
+            """
         #If file csv yeild split lines
         if os.path.isfile(path) and path.endswith('.csv'):
             with open(path, 'r') as uni:
