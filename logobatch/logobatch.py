@@ -59,7 +59,7 @@ class BatchManager:
         """ reads bbatch yaml file into batches """
         try:
             with open(bbatch_yml, 'r') as yfile:
-                kwds = yaml.load(yfile)
+                kwds = yaml.safe_load(yfile)
         except TypeError:
             pass
 
