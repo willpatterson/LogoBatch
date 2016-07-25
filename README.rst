@@ -13,7 +13,7 @@ LogoBatch
 cluster using ``Slurm`` or ``SSH``. LogoBatch was originally designed to 
 automate the process of running thousands of NetLogo models. 
 
-**LogoBatch should be considered pre-release software.**
+**LogoBatch is pre-release software.**
 LogoBatch is currently being refactored.
 
 Batch Of Batches (BBatch)
@@ -31,7 +31,8 @@ Images can be created with using LogoBatch's utility ``makebimg``.
 Batch Image structure
 =====================
 
-Some structural ideas were take from `cookie-cutter-data-science <https://github.com/drivendata/cookiecutter-data-science>`_.
+Some structural elements were taken from 
+`cookie-cutter-data-science <https://github.com/drivendata/cookiecutter-data-science>`_.
 
 ::
 
