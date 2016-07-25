@@ -120,6 +120,13 @@ class Batch(object):
         else: raise InputsError(("Inputs path doesn't lead to a valid"
                                  " file, csv file or directory"))
 
+    def generate_commands(self):
+        """Generates batch commands to be run through a launcher"""
+        for count, inputs in enumerate(self.generate_inputs(self.inputs)):
+            command_id = '_'.join([self.name[:3], count])
+            yield self.format_command(command_id, inputs=inputs)
+
+
 class Command(object):
     """Represents a valid shell command"""
     def __init__(self, executable, body):
