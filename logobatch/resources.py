@@ -47,8 +47,12 @@ class RemoteLauncher(Launcher):
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         self.ssh.connect(hostname)
 
+    def configure_remote_data(self):
+        """Configures setup to input and output data between nodes and head"""
+        pass
+
     def launch_command(self, command):
-        """ """
+        """Launches command over ssh"""
         if not isinstance(command, str):
             try:
                 command = ' '.join(command)
