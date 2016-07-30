@@ -3,6 +3,7 @@
 import os
 import sys
 import socket
+import getpass
 import paramiko
 import subprocess
 
@@ -40,12 +41,12 @@ class RemoteLauncher(Launcher):
     Used to launch shell commands on remote machines via ssh as well
     as deal with input file and resulting output file transfers
     """
-    def __init__(self, hostname):
+    def __init__(self, hostname, username):
         """ """
         #Test and setup ssh connection
         self.ssh = paramiko.SSHClient()
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        self.ssh.connect(hostname)
+        self.ssh.connect(hostname, username=username)
 
     def configure_remote_data(self):
         """Configures setup to input and output data between nodes and head"""
@@ -59,7 +60,7 @@ class RemoteLauncher(Launcher):
             except TypeError:
                 raise TypeError('Launch job requires a string or iterable')
 
-        ssh_stdin, ssh_stdout, ssh_stderr = self.ssh.exec_command(command)
+        _, ssh_stdout, ssh_stderr = self.ssh.exec_command(command)
         return self.JobOut(ssh_stdout, ssh_stderr)
 
 
@@ -88,9 +89,13 @@ class Resource(object):
                 return super(Resource, cls).__new__(sub_cls)
         raise TypeError("Resource doesn't exist: {}".format(resource_type))
 
-    def __init__(self, name, hostname=None, **kwds):
+    def __init__(self, name, hostname=None, username=None, **kwds):
         self.name = name
         self.launcher = Launcher(hostname)
+        if username is None:
+            self.username = getpass.getuser()
+        else:
+            self.username = username
 
 class ComputeServer(Resource):
     """
