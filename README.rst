@@ -9,11 +9,13 @@
 LogoBatch
 *********
 
-``LogoBatch`` is a simple utility for distributing shell commands while
-handeling remote input and output on a tradtional or ad-hoc beowulf cluster 
-using ``Slurm`` or ``SSH``. LogoBatch was originally designed to 
-automate the process of running thousands of NetLogo models on a Rocks Cluster.
+``LogoBatch`` is a simple grid system for distributing large computational batches across
+clusters and single nodes, such as desktop computers, as if they were the same system.
+LogoBatch uses SSH to distribute jobs. LogoBatch does not need to be installed on a grid's
+compute nodes, all the nodes are configured and then deconstructed by LogoBatch durring runtime,
+optionally leaving no trace.
 
+jobs across user-defined computing resources. 
 **LogoBatch is pre-release software.**
 LogoBatch is currently being refactored.
 
