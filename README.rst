@@ -9,11 +9,20 @@
 LogoBatch
 *********
 
-``LogoBatch`` is a simple grid system for distributing large computational batches across
+``LogoBatch`` is a simple ad-hoc grid system for distributing large computational batches across
 clusters and single nodes, such as desktop computers, as if they were the same system.
-LogoBatch uses SSH to distribute jobs. LogoBatch does not need to be installed on a grid's
-compute nodes, all the nodes are configured and then deconstructed by LogoBatch durring runtime,
-optionally leaving no trace.
+
+What Makes LogoBatch Different?
+===============================
+LogoBatch is a ad-hoc grid system. This means that end-users can use LogoBatch to easily build computing
+grids out of systems they do not have root access too.
+
+LogoBatch does not need to be installed on a grid's compute nodes, all the nodes are
+configured and then deconstructed by LogoBatch durring runtime, optionally leaving no trace on 
+any system used to run jobs.
+
+All inter-system jobs are distributed using SSH. LogoBatch will have interfaces for schedulers and
+existing grid computing systems allowing seamless job deployment between different computing system types.
 
 jobs across user-defined computing resources. 
 **LogoBatch is pre-release software.**
